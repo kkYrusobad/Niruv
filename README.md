@@ -66,8 +66,8 @@ For detailed guides on installation, configuration, and development, please refe
 
 ```bash
 # Clone the repository
-git clone https://github.com/kkYrusobad/niruv.git
-cd niruv
+git clone https://github.com/kkYrusobad/Nirav.git
+cd Nirav/Niruv
 
 # Run the install script
 ./install.sh
@@ -80,14 +80,17 @@ The install script will:
 
 - Check and optionally install dependencies
 - Create config directories (`~/.config/niruv`, `~/.cache/niruv`)
+- **Automatically configure project root in `settings.json`**
 - Create Quickshell symlink
 - Optionally install [oNIgiRI](https://github.com/kkYrusobad/oNIgiRI) menu scripts
 
 For manual setup or more details, see the [Documentation](Documentation/02_Installation.md).
 
-### Modern Portability
+### Automatic Project Detection
 
-Niruv automatically detects its project root. However, if you are running it from a non-standard location or via a wrapper, you can manually specify the path:
+Niruv automatically detects and configures its project root during installation. The install script writes the project path to `~/.config/niruv/settings.json`, ensuring oNIgiRI scripts and other features work out of the box.
+
+If needed, you can override this via environment variable:
 
 ```bash
 export NIRUV_PROJECT_DIR="/path/to/your/niruv-folder"
@@ -109,6 +112,11 @@ You can customize the bar position, density, workspace icons, and more. Changes 
 
 ```json
 {
+  "general": {
+    "projectRoot": "/path/to/noctaliaChange/",
+    "scaleRatio": 1.0,
+    "animationSpeed": 1.0
+  },
   "bar": {
     "position": "top",
     "density": "default",
@@ -120,6 +128,23 @@ You can customize the bar position, density, workspace icons, and more. Changes 
 ### Manual Source Edits
 
 If you need to change something not yet in the JSON config, you can still edit the QML files. For example, to change workspace icons, edit `Modules/Bar/Widgets/Workspace.qml`.
+
+## 🔧 oNIgiRI Integration
+
+Niruv integrates with [oNIgiRI](https://github.com/kkYrusobad/oNIgiRI) to provide system menu functionality:
+
+- 📸 **Screenshot utilities** - region capture, fullscreen, clipboard
+- 🌙 **Screensaver & night light** - toggle controls
+- 📦 **Package management** - pacman, AUR installers
+- 🌐 **App installers** - create web apps and TUI apps
+- ⚙️ **System controls** - WiFi, Bluetooth, power profiles
+
+The launcher (accessible via IPC or keybinding) provides two modes:
+
+- **Apps Mode** (  ): Search and launch desktop applications
+- **Menu Mode** ( 󰄛 ): Access oNIgiRI system menu categories
+
+Press **Tab** to switch between modes. Scripts are automatically configured during installation, with the bin path resolved from `settings.json`.
 
 ## 📁 Project Structure
 
@@ -189,6 +214,40 @@ niruv/
     └── UI/
         └── ToastService.qml   # Desktop notifications
 ```
+
+## 🔧 Troubleshooting
+
+### oNIgiRI Scripts Not Working
+
+If screenshot, screensaver, or other menu scripts don't execute:
+
+1. **Verify projectRoot** - Check that `~/.config/niruv/settings.json` contains:
+
+   ```json
+   {
+     "general": {
+       "projectRoot": "/full/path/to/noctaliaChange/"
+     }
+   }
+   ```
+
+   The path should point to the parent directory containing both `Niruv/` and `oNIgiRI/` folders.
+
+2. **Restart Quickshell** - Changes to settings require a restart:
+
+   ```bash
+   killall qs && qs -c niruv
+   ```
+
+3. **Check script permissions** - Ensure oNIgiRI scripts are executable:
+
+   ```bash
+   chmod +x oNIgiRI/bin/*
+   ```
+
+### Manual projectRoot Configuration
+
+If automatic detection fails during installation, manually edit `~/.config/niruv/settings.json` and add the `projectRoot` property as shown above.
 
 ## 🙏 Acknowledgments
 
