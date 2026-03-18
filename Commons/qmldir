@@ -9,3 +9,6 @@ PanelPopup 1.0 PanelPopup.qml
 PanelActionButton 1.0 PanelActionButton.qml
 PanelStatusChip 1.0 PanelStatusChip.qml
 PanelInfoPill 1.0 PanelInfoPill.qml
+MetricRow 1.0 MetricRow.qml
+SliderControl 1.0 SliderControl.qml
+PanelSurface 1.0 PanelSurface.qml

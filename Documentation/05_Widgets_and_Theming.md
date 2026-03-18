@@ -4,7 +4,13 @@ Niruv is built with a robust theming system and a set of interactive widgets.
 
 ## 🎨 Theming System
 
-Niruv uses the **Gruvbox Material Dark** color scheme by default. The color system is designed to be consistent and easy to use.
+Niruv uses **Gruvbox Material Dark** with runtime-selectable variants via `general.themeVariant`:
+
+- `soft` (default)
+- `medium`
+- `hard`
+
+The color system is designed to stay API-stable (`Color.m*`) while switching variants cleanly.
 
 ### Color Palette (`Commons/Color.qml`)
 
@@ -30,6 +36,14 @@ The `Style` singleton defines standard dimensions and animations:
 - **Radii**: `Style.radiusXS` (8px), `Style.radiusS` (12px), `Style.radiusM` (16px).
 - **Animations**: `Style.animationFast` (150ms), `Style.animationNormal` (300ms).
 
+Animation timing now also responds to `general.animationMode`:
+
+- `subtle`: quicker, low-emphasis motion.
+- `balanced` (default): polished and restrained.
+- `expressive`: slower, more pronounced transitions.
+
+`general.animationDisabled` remains the hard-off switch and `general.animationSpeed` remains the global multiplier.
+
 ## 🧱 Shared Panel Primitives
 
 To keep panel code minimal and consistent, Niruv uses small shared primitives:
@@ -38,6 +52,9 @@ To keep panel code minimal and consistent, Niruv uses small shared primitives:
 - `PanelActionButton`: standard action rows used by multiple panels.
 - `PanelStatusChip`: compact status badges (OFF/CONNECTED/IDLE).
 - `PanelInfoPill`: tiny informational pills for secondary state hints.
+- `PanelSurface`: shared panel shell surface (radius, border, shadow, content spacing).
+- `SliderControl`: reusable slider row primitive for panel controls.
+- `MetricRow`: reusable icon/label/value stat row primitive.
 
 These primitives are intentionally small and explicit to preserve a suckless architecture.
 
@@ -188,6 +205,14 @@ Network connectivity widgets with shared **NetworkPanel**.
   - Bluetooth section: Toggle switch, device name, "Bluetooth Settings" button (opens bluetui TUI)
   - Summary card: connection health + manual refresh + last update time
   - Status chips and info pills for clearer radio/link/device state
+
+### Bar Edge Icons
+
+Bar edge icons are configurable through `bar.edgeIcons`:
+
+- `enabled`, `left`, `right`, `opacity`
+- `edgeInset` (distance from screen edge)
+- `sectionGapLeft`, `sectionGapRight` (spacing from left/right widget groups)
 
 ### Night Light Widget
 

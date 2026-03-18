@@ -1,7 +1,9 @@
 {
   "general": {
     "scaleRatio": 1.0,
+    "themeVariant": "soft",
     "animationSpeed": 1.0,
+    "animationMode": "balanced",
     "radiusRatio": 1.0,
     "screenRadiusRatio": 1.0,
     "shadowOffsetX": 2,
@@ -14,6 +16,16 @@
     "density": "default",
     "showCapsule": true,
     "capsuleOpacity": 0.5,
+    "edgeIcons": {
+      "enabled": true,
+      "left": "",
+      "right": "",
+      "opacity": 1.0,
+      "edgeInset": 6,
+      "sectionGap": 14,
+      "sectionGapLeft": 14,
+      "sectionGapRight": 14
+    },
     "widgets": {
       "media": true,
       "visualizer": true,

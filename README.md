@@ -30,7 +30,7 @@ This keeps startup lighter, maintenance simpler, and feature parity intact.
 
 ## ✨ Features
 
-- 🎨 **Gruvbox Material Dark** color scheme
+- 🎨 **Gruvbox Material Dark** with `soft` / `medium` / `hard` variants
 - 🖥️ **Workspace indicators** with Nerd Font icons and smooth animations
 - 📊 **System Monitor** showing CPU%, RAM%, temperature, and load average with threshold alerts
 - 🪟 **Active Window** shows focused window icon and title
@@ -51,6 +51,7 @@ This keeps startup lighter, maintenance simpler, and feature parity intact.
 - 🚀 **Minimalist Launcher** with app search + system menu (Tab to switch modes)
 - 🖱️ **Click-outside-to-close** panels - click anywhere outside or press ESC
 - 📺 **On-Screen Display (OSD)** visual feedback for volume/brightness/media changes
+- 🎬 **Animation profiles** with `subtle` / `balanced` / `expressive` motion modes
 - ⚡ **Power Profiles** switch between Performance/Balanced/Power Saver modes
 - 🔔 **System Tray** displays tray icons with right-click context menus
 
@@ -58,6 +59,8 @@ This keeps startup lighter, maintenance simpler, and feature parity intact.
 
 - Shared panel shell via `Commons/PanelPopup.qml` used across major panels.
 - Shared micro-components (`PanelActionButton`, `PanelStatusChip`, `PanelInfoPill`) reduce repeated QML blocks.
+- Shared panel primitives (`SliderControl`, `MetricRow`, `PanelSurface`) keep panels explicit but DRY.
+- Bar edge icons support independent side spacing via `bar.edgeIcons.sectionGapLeft` and `sectionGapRight`.
 - Single heartbeat stats polling in `Services/System/SystemStatService.qml`.
 - Launcher apps are lazily loaded and cached in `Services/System/ApplicationsService.qml`.
 - Bar widgets are toggleable through `bar.widgets` with loader-based instantiation in `Modules/Bar/Bar.qml`.
@@ -133,6 +136,8 @@ You can customize the bar position, density, workspace icons, and more. Changes 
 {
   "general": {
     "projectRoot": "/path/to/noctaliaChange/",
+    "themeVariant": "soft",
+    "animationMode": "balanced",
     "scaleRatio": 1.0,
     "animationSpeed": 1.0
   },

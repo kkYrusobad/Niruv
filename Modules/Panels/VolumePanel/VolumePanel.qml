@@ -21,29 +21,10 @@ PanelPopup {
   readonly property int volumePercent: Math.round(volume * 100)
 
   // Panel background
-  Rectangle {
+  PanelSurface {
     id: panelContent
     width: root.panelWidth
-    height: contentColumn.implicitHeight + Style.marginL * 2
-    radius: Style.radiusL
-    color: Color.mSurface
-    border.color: Color.mOutline
-    border.width: Style.borderS
-
-    // Shadow effect
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: -2
-      z: -1
-      radius: parent.radius + 2
-      color: Qt.alpha(Color.mShadow, 0.3)
-    }
-
-    ColumnLayout {
-      id: contentColumn
-      anchors.fill: parent
-      anchors.margins: Style.marginL
-      spacing: Style.marginM
+    height: implicitHeight
 
       // Header with volume icon and percentage
       Rectangle {
@@ -108,102 +89,16 @@ PanelPopup {
       }
 
       // Volume slider card
-      Rectangle {
+      SliderControl {
         Layout.fillWidth: true
         Layout.preferredHeight: 60
-        radius: Style.radiusM
-        color: Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: Style.borderS
-
-        RowLayout {
-          anchors.fill: parent
-          anchors.margins: Style.marginM
-          spacing: Style.marginS
-
-          // Low volume icon
-          Text {
-            text: "󰕿"
-            color: Color.mOnSurfaceVariant
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeL
-          }
-
-          // Slider track
-          Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 24
-
-            // Track background
-            Rectangle {
-              anchors.left: parent.left
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              height: 6
-              radius: 3
-              color: Color.mOutline
-            }
-
-            // Track fill
-            Rectangle {
-              anchors.left: parent.left
-              anchors.verticalCenter: parent.verticalCenter
-              width: parent.width * root.volume
-              height: 6
-              radius: 3
-              color: root.muted ? Color.mOnSurfaceVariant : Color.mPrimary
-
-              Behavior on width {
-                NumberAnimation { duration: 50 }
-              }
-            }
-
-            // Handle
-            Rectangle {
-              x: parent.width * root.volume - width / 2
-              anchors.verticalCenter: parent.verticalCenter
-              width: 16
-              height: 16
-              radius: width / 2
-              color: root.muted ? Color.mOnSurfaceVariant : Color.mPrimary
-              border.color: Color.mSurface
-              border.width: 2
-
-              Behavior on x {
-                NumberAnimation { duration: 50 }
-              }
-            }
-
-            // Mouse interaction
-            MouseArea {
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-
-              onPressed: (mouse) => {
-                updateVolume(mouse.x);
-              }
-
-              onPositionChanged: (mouse) => {
-                if (pressed) {
-                  updateVolume(mouse.x);
-                }
-              }
-
-              function updateVolume(mouseX) {
-                var newVolume = Math.max(0, Math.min(1, mouseX / width));
-                AudioService.setVolume(newVolume);
-              }
-            }
-          }
-
-          // High volume icon
-          Text {
-            text: "󰕾"
-            color: Color.mOnSurfaceVariant
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeL
-          }
+        value: root.volume
+        accentColor: root.muted ? Color.mOnSurfaceVariant : Color.mPrimary
+        iconColor: Color.mOnSurfaceVariant
+        leftIcon: "󰕿"
+        rightIcon: "󰕾"
+        onValueChangeRequested: function(newValue) {
+          AudioService.setVolume(newValue);
         }
       }
 
@@ -328,7 +223,6 @@ PanelPopup {
           }
         }
       }
-    }
 
     // Animation
     scale: root.visible ? 1.0 : 0.95
@@ -338,14 +232,14 @@ PanelPopup {
     Behavior on scale {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
 
     Behavior on opacity {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
   }

@@ -21,29 +21,10 @@ PanelPopup {
   readonly property int brightnessPercent: Math.round(brightness * 100)
 
   // Panel background
-  Rectangle {
+  PanelSurface {
     id: panelContent
     width: root.panelWidth
-    height: contentColumn.implicitHeight + Style.marginL * 2
-    radius: Style.radiusL
-    color: Color.mSurface
-    border.color: Color.mOutline
-    border.width: Style.borderS
-
-    // Shadow effect
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: -2
-      z: -1
-      radius: parent.radius + 2
-      color: Qt.alpha(Color.mShadow, 0.3)
-    }
-
-    ColumnLayout {
-      id: contentColumn
-      anchors.fill: parent
-      anchors.margins: Style.marginL
-      spacing: Style.marginM
+    height: implicitHeight
 
       // Header with brightness icon and percentage
       Rectangle {
@@ -87,102 +68,17 @@ PanelPopup {
       }
 
       // Brightness slider card
-      Rectangle {
+      SliderControl {
         Layout.fillWidth: true
         Layout.preferredHeight: 60
-        radius: Style.radiusM
-        color: Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: Style.borderS
-
-        RowLayout {
-          anchors.fill: parent
-          anchors.margins: Style.marginM
-          spacing: Style.marginS
-
-          // Low brightness icon
-          Text {
-            text: "󰃞"
-            color: Color.mOnSurfaceVariant
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeL
-          }
-
-          // Slider track
-          Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 24
-
-            // Track background
-            Rectangle {
-              anchors.left: parent.left
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              height: 6
-              radius: 3
-              color: Color.mOutline
-            }
-
-            // Track fill
-            Rectangle {
-              anchors.left: parent.left
-              anchors.verticalCenter: parent.verticalCenter
-              width: parent.width * root.brightness
-              height: 6
-              radius: 3
-              color: Color.mSecondary
-
-              Behavior on width {
-                NumberAnimation { duration: 50 }
-              }
-            }
-
-            // Handle
-            Rectangle {
-              x: parent.width * root.brightness - width / 2
-              anchors.verticalCenter: parent.verticalCenter
-              width: 16
-              height: 16
-              radius: width / 2
-              color: Color.mSecondary
-              border.color: Color.mSurface
-              border.width: 2
-
-              Behavior on x {
-                NumberAnimation { duration: 50 }
-              }
-            }
-
-            // Mouse interaction
-            MouseArea {
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-
-              onPressed: (mouse) => {
-                updateBrightness(mouse.x);
-              }
-
-              onPositionChanged: (mouse) => {
-                if (pressed) {
-                  updateBrightness(mouse.x);
-                }
-              }
-
-              function updateBrightness(mouseX) {
-                var newBrightness = Math.max(0.01, Math.min(1, mouseX / width));
-                BrightnessService.setBrightness(newBrightness);
-              }
-            }
-          }
-
-          // High brightness icon
-          Text {
-            text: "󰃠"
-            color: Color.mOnSurfaceVariant
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeL
-          }
+        value: root.brightness
+        minValue: 0.01
+        accentColor: Color.mSecondary
+        iconColor: Color.mOnSurfaceVariant
+        leftIcon: "󰃞"
+        rightIcon: "󰃠"
+        onValueChangeRequested: function(newValue) {
+          BrightnessService.setBrightness(newValue);
         }
       }
 
@@ -292,7 +188,6 @@ PanelPopup {
           }
         }
       }
-    }
 
     // Animation
     scale: root.visible ? 1.0 : 0.95
@@ -302,14 +197,14 @@ PanelPopup {
     Behavior on scale {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
 
     Behavior on opacity {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
   }

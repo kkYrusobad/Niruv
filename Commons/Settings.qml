@@ -100,9 +100,35 @@ Singleton {
       const raw = text();
       if (!raw || !raw.length) return;
 
+      let needsSave = false;
+
       // Legacy settings.json files may miss newer nested defaults like bar.widgets.
       if (raw.indexOf('"widgets"') === -1) {
         Logger.i("Settings", "Migrating settings schema: adding missing bar.widgets defaults");
+        needsSave = true;
+      }
+
+      if (raw.indexOf('"edgeIcons"') === -1) {
+        Logger.i("Settings", "Migrating settings schema: adding missing bar.edgeIcons defaults");
+        needsSave = true;
+      }
+
+      if (raw.indexOf('"sectionGapLeft"') === -1 || raw.indexOf('"sectionGapRight"') === -1) {
+        Logger.i("Settings", "Migrating settings schema: adding missing bar.edgeIcons side-specific gap defaults");
+        needsSave = true;
+      }
+
+      if (raw.indexOf('"themeVariant"') === -1) {
+        Logger.i("Settings", "Migrating settings schema: adding missing general.themeVariant default");
+        needsSave = true;
+      }
+
+      if (raw.indexOf('"animationMode"') === -1) {
+        Logger.i("Settings", "Migrating settings schema: adding missing general.animationMode default");
+        needsSave = true;
+      }
+
+      if (needsSave) {
         save();
       }
     }
@@ -142,7 +168,9 @@ Singleton {
     property JsonObject general: JsonObject {
       property string projectRoot: ""
       property real scaleRatio: 1.0
+      property string themeVariant: "soft" // soft, medium, hard
       property real animationSpeed: 1.0
+      property string animationMode: "balanced" // subtle, balanced, expressive
       property real radiusRatio: 1.0
       property real screenRadiusRatio: 1.0
       property int shadowOffsetX: 2
@@ -156,6 +184,17 @@ Singleton {
       property string density: "default"
       property bool showCapsule: true
       property real capsuleOpacity: 0.5
+
+      property JsonObject edgeIcons: JsonObject {
+        property bool enabled: true
+        property string left: ""
+        property string right: ""
+        property real opacity: 1.0
+        property int edgeInset: 2
+        property int sectionGap: 14 // legacy fallback
+        property int sectionGapLeft: 14
+        property int sectionGapRight: 14
+      }
 
       property JsonObject widgets: JsonObject {
         property bool media: true

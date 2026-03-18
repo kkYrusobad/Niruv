@@ -40,13 +40,46 @@ Variants {
         model: NotificationService.activeList
 
         delegate: Rectangle {
+          id: notifCard
+          required property var model
+
           Layout.preferredWidth: 350
           Layout.preferredHeight: contentLayout.implicitHeight + Style.marginL * 2
-          
+
+          property bool hovered: false
+
           radius: Style.radiusM
-          color: Color.mSurface
+          color: hovered ? Qt.lighter(Color.mSurface, 1.06) : Color.mSurface
           border.color: Color.mOutline
           border.width: Style.borderS
+          opacity: 0.0
+          scale: 0.97
+
+          Behavior on color {
+            ColorAnimation {
+              duration: Style.animationFast
+              easing.type: Style.easingStandard
+            }
+          }
+
+          Behavior on opacity {
+            NumberAnimation {
+              duration: Style.animationFast
+              easing.type: Style.easingStandard
+            }
+          }
+
+          Behavior on scale {
+            NumberAnimation {
+              duration: Style.animationFast
+              easing.type: Style.easingEnter
+            }
+          }
+
+          Component.onCompleted: {
+            opacity = 1.0;
+            scale = 1.0;
+          }
 
           // Shadow effect
           Rectangle {
@@ -108,7 +141,25 @@ Variants {
 
           MouseArea {
             anchors.fill: parent
-            onClicked: NotificationService.removeNotification(model.id)
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+
+            onEntered: notifCard.hovered = true
+            onExited: notifCard.hovered = false
+
+            onClicked: {
+              notifCard.opacity = 0.0;
+              notifCard.scale = 0.97;
+              dismissTimer.restart();
+            }
+          }
+
+          Timer {
+            id: dismissTimer
+            interval: Style.animationFast + 30
+            running: false
+            repeat: false
+            onTriggered: NotificationService.removeNotification(notifCard.model.id)
           }
         }
       }

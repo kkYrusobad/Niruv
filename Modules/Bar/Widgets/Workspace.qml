@@ -105,8 +105,8 @@ Item {
       property: "masterProgress"
       from: 0.0
       to: 1.0
-      duration: Style.animationSlow * 2
-      easing.type: Easing.OutQuint
+      duration: Style.animationSlow
+      easing.type: Style.easingEnter
     }
     PropertyAction {
       target: root
@@ -189,14 +189,14 @@ Item {
           // Noctalia-style animations with OutBack easing
           Behavior on scale {
             NumberAnimation {
-              duration: Style.animationNormal
-              easing.type: Easing.OutBack
+              duration: Style.animationFast
+              easing.type: Style.easingEmphasized
             }
           }
           Behavior on color {
             ColorAnimation {
               duration: Style.animationFast
-              easing.type: Easing.InOutCubic
+              easing.type: Style.easingStandard
             }
           }
         }
@@ -204,8 +204,8 @@ Item {
         // Container width animation for smooth expand/collapse
         Behavior on width {
           NumberAnimation {
-            duration: Style.animationNormal
-            easing.type: Easing.OutBack
+            duration: Style.animationFast
+            easing.type: Style.easingStandard
           }
         }
 

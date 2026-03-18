@@ -109,6 +109,14 @@ ShellRoot {
         right: true
       }
 
+      // Exclude the bar region so bar icon clicks don't race with backdrop close logic.
+      margins {
+        top: Settings.data.bar.position === "top" ? Style.barHeight : 0
+        bottom: Settings.data.bar.position === "bottom" ? Style.barHeight : 0
+        left: Settings.data.bar.position === "left" ? Style.barHeight : 0
+        right: Settings.data.bar.position === "right" ? Style.barHeight : 0
+      }
+
       // Layer shell properties - sits between bar and popups
       WlrLayershell.namespace: "niruv-panel-backdrop"
       WlrLayershell.layer: WlrLayer.Top
@@ -123,6 +131,7 @@ ShellRoot {
       // Catch clicks anywhere on this overlay to close panels
       MouseArea {
         anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onClicked: {
           PanelState.closeOpenPanel();
         }

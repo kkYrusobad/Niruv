@@ -62,12 +62,37 @@ Singleton {
   readonly property real shadowHorizontalOffset: Settings.data.general.shadowOffsetX
   readonly property real shadowVerticalOffset: Settings.data.general.shadowOffsetY
 
+  // Motion profile
+  readonly property string animationMode: {
+    const mode = Settings.data.general.animationMode;
+    if (mode === "subtle" || mode === "expressive") {
+      return mode;
+    }
+    return "balanced";
+  }
+  readonly property bool animationsDisabled: Settings.data.general.animationDisabled || PowerProfileService.performanceMode
+  readonly property real animationModeFactor: {
+    switch (animationMode) {
+      case "subtle": return 0.85;
+      case "expressive": return 1.2;
+      case "balanced":
+      default:
+        return 1.0;
+    }
+  }
+
+  // Shared easing tokens for consistent interaction feel
+  readonly property int easingStandard: Easing.InOutCubic
+  readonly property int easingEnter: Easing.OutCubic
+  readonly property int easingExit: Easing.InCubic
+  readonly property int easingEmphasized: Easing.OutBack
+
   // Animation duration (ms)
-  readonly property int animationFaster: (Settings.data.general.animationDisabled || PowerProfileService.performanceMode) ? 0 : Math.round(75 / Settings.data.general.animationSpeed)
-  readonly property int animationFast: (Settings.data.general.animationDisabled || PowerProfileService.performanceMode) ? 0 : Math.round(150 / Settings.data.general.animationSpeed)
-  readonly property int animationNormal: (Settings.data.general.animationDisabled || PowerProfileService.performanceMode) ? 0 : Math.round(300 / Settings.data.general.animationSpeed)
-  readonly property int animationSlow: (Settings.data.general.animationDisabled || PowerProfileService.performanceMode) ? 0 : Math.round(450 / Settings.data.general.animationSpeed)
-  readonly property int animationSlowest: (Settings.data.general.animationDisabled || PowerProfileService.performanceMode) ? 0 : Math.round(750 / Settings.data.general.animationSpeed)
+  readonly property int animationFaster: animationsDisabled ? 0 : Math.round((75 * animationModeFactor) / Settings.data.general.animationSpeed)
+  readonly property int animationFast: animationsDisabled ? 0 : Math.round((150 * animationModeFactor) / Settings.data.general.animationSpeed)
+  readonly property int animationNormal: animationsDisabled ? 0 : Math.round((300 * animationModeFactor) / Settings.data.general.animationSpeed)
+  readonly property int animationSlow: animationsDisabled ? 0 : Math.round((450 * animationModeFactor) / Settings.data.general.animationSpeed)
+  readonly property int animationSlowest: animationsDisabled ? 0 : Math.round((750 * animationModeFactor) / Settings.data.general.animationSpeed)
 
   // Delays
   readonly property int tooltipDelay: 300

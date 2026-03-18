@@ -64,14 +64,10 @@ PanelPopup {
   }
 
   // Panel background
-  Rectangle {
+  PanelSurface {
     id: panelContent
     width: root.panelWidth
-    height: contentColumn.implicitHeight + Style.marginL * 2
-    radius: Style.radiusL
-    color: Color.mSurface
-    border.color: Color.mOutline
-    border.width: Style.borderS
+    height: implicitHeight
     clip: true
 
     // Album art background (blurred effect via scaling)
@@ -106,15 +102,6 @@ PanelPopup {
       Behavior on opacity {
         NumberAnimation { duration: Style.animationNormal }
       }
-    }
-
-    // Shadow effect
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: -2
-      z: -1
-      radius: parent.radius + 2
-      color: Qt.alpha(Color.mShadow, 0.3)
     }
 
     ColumnLayout {
@@ -259,7 +246,12 @@ PanelPopup {
             }
 
             scale: playMouseArea.pressed ? 0.95 : 1.0
-            Behavior on scale { NumberAnimation { duration: 100 } }
+            Behavior on scale {
+              NumberAnimation {
+                duration: Style.animationFaster
+                easing.type: Style.easingEnter
+              }
+            }
           }
 
           // Next button
@@ -364,14 +356,14 @@ PanelPopup {
     Behavior on scale {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
 
     Behavior on opacity {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
   }

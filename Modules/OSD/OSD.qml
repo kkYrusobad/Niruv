@@ -221,32 +221,49 @@ Variants {
         Behavior on opacity {
           NumberAnimation {
             duration: Style.animationNormal
-            easing.type: Easing.InOutQuad
+            easing.type: Style.easingStandard
           }
         }
 
         Behavior on scale {
           NumberAnimation {
             duration: Style.animationNormal
-            easing.type: Easing.InOutQuad
+            easing.type: Style.easingEnter
           }
         }
 
-        // Auto-hide timer
-        Timer {
-          id: hideTimer
-          interval: 2000
-          onTriggered: osdItem.hide()
-        }
+        SequentialAnimation {
+          id: lifecycleAnimation
+          running: false
 
-        // Visibility timer for cleanup
-        Timer {
-          id: visibilityTimer
-          interval: Style.animationNormal + 50
-          onTriggered: {
-            osdItem.visible = false;
-            root.currentOSDType = -1;
-            root.active = false;
+          PauseAnimation {
+            duration: 2000
+          }
+
+          ParallelAnimation {
+            NumberAnimation {
+              target: osdItem
+              property: "opacity"
+              to: 0.0
+              duration: Style.animationFast
+              easing.type: Style.easingExit
+            }
+
+            NumberAnimation {
+              target: osdItem
+              property: "scale"
+              to: 0.94
+              duration: Style.animationFast
+              easing.type: Style.easingExit
+            }
+          }
+
+          ScriptAction {
+            script: {
+              osdItem.visible = false;
+              root.currentOSDType = -1;
+              root.active = false;
+            }
           }
         }
 
@@ -266,7 +283,7 @@ Variants {
             anchors.margins: -2
             z: -1
             radius: parent.radius + 2
-            color: Qt.alpha(Color.mShadow, root.opacity * 0.3)
+            color: Qt.alpha(Color.mShadow, osdItem.opacity * 0.3)
             visible: osdItem.visible
           }
 
@@ -289,7 +306,7 @@ Variants {
               Behavior on color {
                 ColorAnimation {
                   duration: Style.animationFast
-                  easing.type: Easing.InOutQuad
+                  easing.type: Style.easingStandard
                 }
               }
             }
@@ -314,14 +331,14 @@ Variants {
                 Behavior on width {
                   NumberAnimation {
                     duration: Style.animationFast
-                    easing.type: Easing.OutCubic
+                    easing.type: Style.easingEnter
                   }
                 }
 
                 Behavior on color {
                   ColorAnimation {
                     duration: Style.animationFast
-                    easing.type: Easing.InOutQuad
+                    easing.type: Style.easingStandard
                   }
                 }
               }
@@ -357,8 +374,7 @@ Variants {
         }
 
         function show() {
-          hideTimer.stop();
-          visibilityTimer.stop();
+          lifecycleAnimation.stop();
           osdItem.visible = true;
 
           Qt.callLater(() => {
@@ -366,15 +382,19 @@ Variants {
             osdItem.scale = 1.0;
           });
 
-          hideTimer.start();
+          lifecycleAnimation.start();
         }
 
         function hide() {
-          hideTimer.stop();
-          visibilityTimer.stop();
+          lifecycleAnimation.stop();
           osdItem.opacity = 0;
-          osdItem.scale = 0.9;
-          visibilityTimer.start();
+          osdItem.scale = 0.94;
+
+          Qt.callLater(() => {
+            osdItem.visible = false;
+            root.currentOSDType = -1;
+            root.active = false;
+          });
         }
       }
 

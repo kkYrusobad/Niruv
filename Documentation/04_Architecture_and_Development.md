@@ -16,6 +16,7 @@ Recent examples in-tree:
 
 - `Commons/PanelPopup.qml`: shared popup shell and panel lifecycle.
 - `Commons/PanelActionButton.qml`, `Commons/PanelStatusChip.qml`, `Commons/PanelInfoPill.qml`: small reusable panel primitives.
+- `Commons/SliderControl.qml`, `Commons/MetricRow.qml`, `Commons/PanelSurface.qml`: reusable panel building blocks for slider rows, stat rows, and panel surfaces.
 - Loader-based widget creation in `Modules/Bar/Bar.qml` via `Settings.data.bar.widgets`.
 - Deferred panel subtrees in heavy panels (device lists, album-art background).
 - Consolidated polling in `Services/System/SystemStatService.qml`.
@@ -48,7 +49,7 @@ Niruv/
 Niruv uses global singletons for shared state and utilities:
 
 - **`Color`**: Defines the Gruvbox Material color palette.
-- **`Style`**: Contains UI tokens like font sizes, margins, and animation durations.
+- **`Style`**: Contains UI tokens like font sizes, margins, animation durations, and shared easing constants.
 - **`Settings`**: Manages user configuration.
 - **`Logger`**: Provides standardized logging (`Logger.i`, `Logger.d`, `Logger.e`).
 - **`Time`**: Clock utilities and timer functionality with alarm sound.
@@ -78,6 +79,7 @@ Popup panels provide detailed information when clicking on bar widgets:
 
 Panel modules should share primitives and avoid repeated inline blocks when possible.
 Use `PanelPopup` for popup roots and keep panel internals focused on feature-specific content.
+Prefer `SliderControl` and `MetricRow` when matching those repeated interaction patterns.
 
 ### Cards (`Modules/Cards/`)
 

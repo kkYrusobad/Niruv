@@ -180,6 +180,7 @@ Item {
 
   // --- Interaction ---
   property bool isExpanded: false
+  property double toggleCooldownUntil: 0
 
   MouseArea {
     id: mouseArea
@@ -194,8 +195,18 @@ Item {
     }
 
     onClicked: {
+      const now = Date.now();
+      if (now < root.toggleCooldownUntil) {
+        return;
+      }
+      root.toggleCooldownUntil = now + 220;
+
       if (networkPanel) {
-        networkPanel.toggle();
+        if (networkPanel.toggleFromBar) {
+          networkPanel.toggleFromBar();
+        } else {
+          networkPanel.toggle();
+        }
       } else {
         // Fallback: open bluetui directly
         btProcess.running = true;

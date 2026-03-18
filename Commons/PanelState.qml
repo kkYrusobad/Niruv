@@ -10,6 +10,8 @@ QtObject {
 
   // Currently open panel (null if none)
   property var currentPanel: null
+  property double lastOpenAtMs: 0
+  property int closeGuardAfterOpenMs: 180
 
   // Track if any panel is open
   readonly property bool hasOpenPanel: currentPanel !== null && currentPanel.visible
@@ -20,13 +22,18 @@ QtObject {
       root.currentPanel.close();
     }
     root.currentPanel = panel;
+    root.lastOpenAtMs = Date.now();
   }
 
   // Close the currently open panel
   function closeOpenPanel() {
+    const now = Date.now();
+    if ((now - root.lastOpenAtMs) < root.closeGuardAfterOpenMs) {
+      return;
+    }
+
     if (root.currentPanel && root.currentPanel.visible) {
       root.currentPanel.close();
-      root.currentPanel = null;
     }
   }
 

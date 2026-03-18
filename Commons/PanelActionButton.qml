@@ -19,9 +19,20 @@ Rectangle {
   border.color: Color.mOutline
   border.width: Style.borderS
   color: buttonMouse.containsMouse ? Qt.alpha(accentColor, 0.2) : baseColor
+  scale: buttonMouse.pressed ? 0.985 : 1.0
 
   Behavior on color {
-    ColorAnimation { duration: Style.animationFast }
+    ColorAnimation {
+      duration: Style.animationFast
+      easing.type: Style.easingStandard
+    }
+  }
+
+  Behavior on scale {
+    NumberAnimation {
+      duration: Style.animationFaster
+      easing.type: Style.easingEnter
+    }
   }
 
   RowLayout {

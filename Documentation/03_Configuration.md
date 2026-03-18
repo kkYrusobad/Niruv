@@ -21,6 +21,16 @@ The `settings.json` file follows this structure:
     "bar": {
         "capsuleOpacity": 0.5,
         "density": "default",
+        "edgeIcons": {
+            "enabled": true,
+            "left": "",
+            "opacity": 1,
+            "right": "",
+            "edgeInset": 2,
+            "sectionGap": 14,
+            "sectionGapLeft": 14,
+            "sectionGapRight": 14
+        },
         "enabled": true,
         "position": "top",
         "showCapsule": true,
@@ -43,12 +53,56 @@ The `settings.json` file follows this structure:
     },
     "general": {
         "animationDisabled": false,
+        "animationMode": "balanced",
         "animationSpeed": 1,
         "radiusRatio": 1,
         "scaleRatio": 1,
         "screenRadiusRatio": 1,
         "shadowOffsetX": 2,
-        "shadowOffsetY": 2
+        "shadowOffsetY": 2,
+        "themeVariant": "soft"
+    }
+}
+```
+
+### Theme Variant
+
+Set `general.themeVariant` to choose your Gruvbox Material depth:
+
+- `"soft"` (default): warm and softer contrast.
+- `"medium"`: balanced contrast.
+- `"hard"`: highest dark contrast.
+
+Example:
+
+```json
+{
+    "general": {
+        "themeVariant": "hard"
+    }
+}
+```
+
+### Animation Profile
+
+`general.animationMode` controls overall motion character while still honoring:
+
+- `general.animationDisabled` (hard-off switch)
+- `general.animationSpeed` (global multiplier)
+
+Supported values:
+
+- `"subtle"`: faster, less pronounced motion.
+- `"balanced"` (default): polished but restrained.
+- `"expressive"`: slightly slower, more visible transitions.
+
+Example:
+
+```json
+{
+    "general": {
+        "animationMode": "subtle",
+        "animationSpeed": 1.1
     }
 }
 ```
@@ -88,6 +142,37 @@ Example: disable heavy widgets for a lean setup
             "wallpaper": false,
             "screenRecorder": false,
             "media": true
+        }
+    }
+}
+```
+
+### Edge Icons
+
+`bar.edgeIcons` controls the decorative symbols shown on the left and right side of the bar.
+
+- `enabled`: show or hide both edge icons.
+- `left`: left-side symbol/glyph.
+- `right`: right-side symbol/glyph.
+- `opacity`: icon capsule opacity from `0.0` to `1.0`.
+- `edgeInset`: distance from the screen edge in px (smaller = closer to edge).
+- `sectionGapLeft`: gap between left edge icon capsule and left widget group.
+- `sectionGapRight`: gap between right edge icon capsule and right widget group.
+- `sectionGap`: legacy fallback used when side-specific keys are not present.
+
+Example:
+
+```json
+{
+    "bar": {
+        "edgeIcons": {
+            "enabled": true,
+            "left": "🐱",
+            "right": "🌙",
+            "opacity": 0.9,
+            "edgeInset": 1,
+            "sectionGapLeft": 24,
+            "sectionGapRight": 18
         }
     }
 }

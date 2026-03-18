@@ -17,29 +17,10 @@ PanelPopup {
 
 
   // Panel background
-  Rectangle {
+  PanelSurface {
     id: panelContent
     width: root.panelWidth
-    height: contentColumn.implicitHeight + Style.marginL * 2
-    radius: Style.radiusL
-    color: Color.mSurface
-    border.color: Color.mOutline
-    border.width: Style.borderS
-
-    // Shadow effect simulation
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: -2
-      z: -1
-      radius: parent.radius + 2
-      color: Qt.alpha(Color.mShadow, 0.3)
-    }
-
-    ColumnLayout {
-      id: contentColumn
-      anchors.fill: parent
-      anchors.margins: Style.marginL
-      spacing: Style.marginM
+    height: implicitHeight
 
       // Calendar Header
       CalendarHeaderCard {
@@ -55,7 +36,6 @@ PanelPopup {
       TimerCard {
         Layout.fillWidth: true
       }
-    }
 
     // Animation
     scale: root.visible ? 1.0 : 0.95
@@ -65,14 +45,14 @@ PanelPopup {
     Behavior on scale {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
 
     Behavior on opacity {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
   }

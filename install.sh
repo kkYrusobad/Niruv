@@ -15,7 +15,7 @@ NC='\033[0m'
 
 echo -e "${BLUE}${BOLD}"
 echo "  ╔═══════════════════════════════════════════════════════╗"
-echo "  ║      निरव · Niruv Shell Installer                     ║"
+echo "  ║      निरव · Niruv Shell Installer                      ║"
 echo "  ║      A minimal, Gruvbox-themed shell for Niri         ║"
 echo "  ╚═══════════════════════════════════════════════════════╝"
 echo -e "${NC}"

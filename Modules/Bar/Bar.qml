@@ -14,6 +14,30 @@ Item {
 
   property ShellScreen screen: null
   readonly property var widgetCfg: (Settings.data.bar && Settings.data.bar.widgets) ? Settings.data.bar.widgets : null
+  readonly property var edgeIconCfg: (Settings.data.bar && Settings.data.bar.edgeIcons) ? Settings.data.bar.edgeIcons : null
+  readonly property bool showEdgeIcons: edgeIconCfg && edgeIconCfg.enabled !== undefined ? !!edgeIconCfg.enabled : true
+  readonly property string leftEdgeIcon: edgeIconCfg && edgeIconCfg.left && edgeIconCfg.left.length > 0 ? edgeIconCfg.left : ""
+  readonly property string rightEdgeIcon: edgeIconCfg && edgeIconCfg.right && edgeIconCfg.right.length > 0 ? edgeIconCfg.right : ""
+  readonly property real edgeInset: {
+    const value = edgeIconCfg && edgeIconCfg.edgeInset !== undefined ? edgeIconCfg.edgeInset : 2;
+    return Math.max(0, value);
+  }
+  readonly property real edgeSectionGapLeft: {
+    const fallback = edgeIconCfg && edgeIconCfg.sectionGap !== undefined ? edgeIconCfg.sectionGap : Style.marginL;
+    const value = edgeIconCfg && edgeIconCfg.sectionGapLeft !== undefined ? edgeIconCfg.sectionGapLeft : fallback;
+    return Math.max(0, value);
+  }
+  readonly property real edgeSectionGapRight: {
+    const fallback = edgeIconCfg && edgeIconCfg.sectionGap !== undefined ? edgeIconCfg.sectionGap : Style.marginL;
+    const value = edgeIconCfg && edgeIconCfg.sectionGapRight !== undefined ? edgeIconCfg.sectionGapRight : fallback;
+    return Math.max(0, value);
+  }
+  readonly property real edgeIconOpacity: {
+    const value = edgeIconCfg && edgeIconCfg.opacity !== undefined ? edgeIconCfg.opacity : 1.0;
+    return Math.max(0.0, Math.min(1.0, value));
+  }
+  readonly property real leftEdgeReservedWidth: showEdgeIcons ? (edgeInset + leftLogoContainer.width + edgeSectionGapLeft) : 0
+  readonly property real rightEdgeReservedWidth: showEdgeIcons ? (edgeInset + rightLogoContainer.width + edgeSectionGapRight) : 0
   readonly property var widgetDefaults: ({
     media: true,
     visualizer: false,
@@ -51,19 +75,20 @@ Item {
   // Left logo icon with backdrop
   Item {
     id: leftLogoContainer
+    visible: root.showEdgeIcons
     anchors.left: parent.left
-    anchors.leftMargin: Style.marginM - 6
+    anchors.leftMargin: root.edgeInset
     anchors.verticalCenter: parent.verticalCenter
-    //width: leftLogoCapsule.width
-    width: 30
+    width: leftLogoCapsule.width
     height: Style.barHeight
     z: 10
+    opacity: root.edgeIconOpacity
 
     Rectangle {
       id: leftLogoCapsule
-      anchors.verticalCenter: parent.verticalCenter
+      anchors.centerIn: parent
       width: leftLogoText.width + Style.marginS * 4
-      height: 20
+      height: Style.capsuleHeight
       radius: height / 2
       color: Color.mSurfaceVariant
     }
@@ -71,7 +96,7 @@ Item {
     Text {
       id: leftLogoText
       anchors.centerIn: leftLogoCapsule
-      text: ""
+      text: root.leftEdgeIcon
       color: Color.mOnSurface
       font.family: Style.fontFamily
       font.pixelSize: Style.fontSizeL
@@ -81,19 +106,20 @@ Item {
   // Right logo icon with backdrop
   Item {
     id: rightLogoContainer
+    visible: root.showEdgeIcons
     anchors.right: parent.right
-    anchors.rightMargin: Style.marginM
+    anchors.rightMargin: root.edgeInset
     anchors.verticalCenter: parent.verticalCenter
-    //width: rightLogoCapsule.width
-    width: 30
+    width: rightLogoCapsule.width
     height: Style.barHeight
     z: 10
+    opacity: root.edgeIconOpacity
 
     Rectangle {
       id: rightLogoCapsule
-      anchors.verticalCenter: parent.verticalCenter
+      anchors.centerIn: parent
       width: rightLogoText.width + Style.marginS * 4
-      height: 20
+      height: Style.capsuleHeight
       radius: height / 2
       color: Color.mSurfaceVariant
     }
@@ -101,7 +127,7 @@ Item {
     Text {
       id: rightLogoText
       anchors.centerIn: rightLogoCapsule
-      text: ""
+      text: root.rightEdgeIcon
       color: Color.mOnSurface
       font.family: Style.fontFamily
       font.pixelSize: Style.fontSizeL
@@ -220,8 +246,8 @@ Item {
   // Bar content layout
   RowLayout {
     anchors.fill: parent
-    anchors.leftMargin: 42
-    anchors.rightMargin: 48
+    anchors.leftMargin: Math.max(Style.marginXL, root.leftEdgeReservedWidth)
+    anchors.rightMargin: Math.max(Style.marginXL, root.rightEdgeReservedWidth)
     spacing: Style.marginM
 
     // Left section - Workspaces, SystemMonitor, and ActiveWindow

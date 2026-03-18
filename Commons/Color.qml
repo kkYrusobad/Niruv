@@ -10,42 +10,109 @@ import Quickshell
 Singleton {
   id: root
 
+  readonly property string themeVariant: {
+    const variant = Settings.data.general.themeVariant;
+    if (variant === "medium" || variant === "hard") {
+      return variant;
+    }
+    return "soft";
+  }
+
+  readonly property var palette: ({
+    soft: {
+      primary: "#a9b665",
+      secondary: "#d8a657",
+      tertiary: "#89b482",
+      orange: "#e78a4e",
+      blue: "#7daea3",
+      purple: "#d3869b",
+      error: "#ea6962",
+      surface: "#32302f",
+      onSurface: "#dab997",
+      surfaceVariant: "#3c3836",
+      onSurfaceVariant: "#bdad9c",
+      outline: "#7c6f64",
+      shadow: "#1d2021",
+      hover: "#3c3836",
+      onHover: "#dab997"
+    },
+    medium: {
+      primary: "#a9b665",
+      secondary: "#d8a657",
+      tertiary: "#89b482",
+      orange: "#e78a4e",
+      blue: "#7daea3",
+      purple: "#d3869b",
+      error: "#ea6962",
+      surface: "#292828",
+      onSurface: "#ddc7a1",
+      surfaceVariant: "#32302f",
+      onSurfaceVariant: "#ebdbb2",
+      outline: "#665c54",
+      shadow: "#1d2021",
+      hover: "#3c3836",
+      onHover: "#ebdbb2"
+    },
+    hard: {
+      primary: "#a9b665",
+      secondary: "#d8a657",
+      tertiary: "#89b482",
+      orange: "#e78a4e",
+      blue: "#7daea3",
+      purple: "#d3869b",
+      error: "#ea6962",
+      surface: "#202020",
+      onSurface: "#ddc7a1",
+      surfaceVariant: "#2a2827",
+      onSurfaceVariant: "#ebdbb2",
+      outline: "#5a524c",
+      shadow: "#1d2021",
+      hover: "#32302f",
+      onHover: "#ebdbb2"
+    }
+  })
+
+  function variantColor(key) {
+    const selected = palette[themeVariant] || palette.soft;
+    return selected[key] || palette.soft[key];
+  }
+
   // --- Key Colors: Gruvbox Material Dark Soft ---
-  readonly property color mPrimary: "#a9b665"       // Green (Soft)
-  readonly property color mOnPrimary: "#32302f"     // Soft BG
+  readonly property color mPrimary: variantColor("primary")
+  readonly property color mOnPrimary: variantColor("surface")
 
-  readonly property color mSecondary: "#d8a657"     // Yellow (Soft)
-  readonly property color mOnSecondary: "#32302f"   // Soft BG
+  readonly property color mSecondary: variantColor("secondary")
+  readonly property color mOnSecondary: variantColor("surface")
 
-  readonly property color mTertiary: "#89b482"      // Aqua (Soft)
-  readonly property color mOnTertiary: "#32302f"    // Soft BG
+  readonly property color mTertiary: variantColor("tertiary")
+  readonly property color mOnTertiary: variantColor("surface")
 
   // --- Additional Gruvbox Colors ---
-  readonly property color mOrange: "#e78a4e"
-  readonly property color mOnOrange: "#32302f"
+  readonly property color mOrange: variantColor("orange")
+  readonly property color mOnOrange: variantColor("surface")
 
-  readonly property color mBlue: "#7daea3"
-  readonly property color mOnBlue: "#32302f"
+  readonly property color mBlue: variantColor("blue")
+  readonly property color mOnBlue: variantColor("surface")
 
-  readonly property color mPurple: "#d3869b"
-  readonly property color mOnPurple: "#32302f"
+  readonly property color mPurple: variantColor("purple")
+  readonly property color mOnPurple: variantColor("surface")
 
   // --- Utility Colors ---
-  readonly property color mError: "#ea6962"         // Red (Soft)
-  readonly property color mOnError: "#32302f"
+  readonly property color mError: variantColor("error")
+  readonly property color mOnError: variantColor("surface")
 
   // --- Surface Colors ---
-  readonly property color mSurface: "#32302f"       // BG Soft
-  readonly property color mOnSurface: "#dab997"     // FG (Soft)
+  readonly property color mSurface: variantColor("surface")
+  readonly property color mOnSurface: variantColor("onSurface")
 
-  readonly property color mSurfaceVariant: "#3c3836" // BG1
-  readonly property color mOnSurfaceVariant: "#bdad9c" // FG3-ish (Soft)
+  readonly property color mSurfaceVariant: variantColor("surfaceVariant")
+  readonly property color mOnSurfaceVariant: variantColor("onSurfaceVariant")
 
-  readonly property color mOutline: "#504945"       // Gray border (Soft)
-  readonly property color mShadow: "#1d2021"        // Hard black
+  readonly property color mOutline: variantColor("outline")
+  readonly property color mShadow: variantColor("shadow")
 
-  readonly property color mHover: "#3c3836"         // BG1
-  readonly property color mOnHover: "#dab997"       // FG (Soft)
+  readonly property color mHover: variantColor("hover")
+  readonly property color mOnHover: variantColor("onHover")
 
   // --- Absolute Colors ---
   readonly property color transparent: "transparent"

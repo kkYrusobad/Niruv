@@ -36,7 +36,10 @@ Item {
   visible: opacity > 0
 
   Behavior on opacity {
-    NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
+    NumberAnimation {
+      duration: Style.animationFast
+      easing.type: Style.easingStandard
+    }
   }
 
   // Backdrop click to close
@@ -133,7 +136,10 @@ Item {
 
     scale: root.isOpen ? 1.0 : 0.96
     Behavior on scale {
-      NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
+      NumberAnimation {
+        duration: Style.animationFast
+        easing.type: Style.easingEnter
+      }
     }
 
     // Keyboard
@@ -288,7 +294,10 @@ Item {
           property bool isCategory: modelData.items !== undefined
 
           Behavior on color {
-            ColorAnimation { duration: 100 }
+            ColorAnimation {
+              duration: Style.animationFaster
+              easing.type: Style.easingStandard
+            }
           }
 
           RowLayout {

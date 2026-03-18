@@ -25,29 +25,10 @@ PanelPopup {
   readonly property bool charging: isReady ? battery.state === UPowerDeviceState.Charging : false
 
   // Panel background
-  Rectangle {
+  PanelSurface {
     id: panelContent
     width: root.panelWidth
-    height: contentColumn.implicitHeight + Style.marginL * 2
-    radius: Style.radiusL
-    color: Color.mSurface
-    border.color: Color.mOutline
-    border.width: Style.borderS
-
-    // Shadow effect
-    Rectangle {
-      anchors.fill: parent
-      anchors.margins: -2
-      z: -1
-      radius: parent.radius + 2
-      color: Qt.alpha(Color.mShadow, 0.3)
-    }
-
-    ColumnLayout {
-      id: contentColumn
-      anchors.fill: parent
-      anchors.margins: Style.marginL
-      spacing: Style.marginM
+    height: implicitHeight
 
       // Header with battery icon and percentage
       Rectangle {
@@ -107,95 +88,35 @@ PanelPopup {
           spacing: Style.marginS
 
           // Time remaining/to full
-          RowLayout {
-            Layout.fillWidth: true
-
-            Text {
-              text: "󰥔"
-              color: Color.mPrimary
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeL
-            }
-
-            Text {
-              text: root.charging ? "Time to full" : "Time remaining"
-              color: Color.mOnSurfaceVariant
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              Layout.fillWidth: true
-            }
-
-            Text {
-              text: {
-                if (root.charging && root.battery.timeToFull > 0) {
-                  return Time.formatVagueHumanReadableDuration(root.battery.timeToFull);
-                }
-                if (!root.charging && root.battery.timeToEmpty > 0) {
-                  return Time.formatVagueHumanReadableDuration(root.battery.timeToEmpty);
-                }
-                return "N/A";
+          MetricRow {
+            icon: "󰥔"
+            label: root.charging ? "Time to full" : "Time remaining"
+            value: {
+              if (root.charging && root.battery.timeToFull > 0) {
+                return Time.formatVagueHumanReadableDuration(root.battery.timeToFull);
               }
-              color: Color.mOnSurface
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              font.weight: Style.fontWeightSemiBold
+              if (!root.charging && root.battery.timeToEmpty > 0) {
+                return Time.formatVagueHumanReadableDuration(root.battery.timeToEmpty);
+              }
+              return "N/A";
             }
+            valueColor: Color.mOnSurface
           }
 
           // Power rate
-          RowLayout {
-            Layout.fillWidth: true
-
-            Text {
-              text: "󱐋"
-              color: Color.mPrimary
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeL
-            }
-
-            Text {
-              text: "Power"
-              color: Color.mOnSurfaceVariant
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              Layout.fillWidth: true
-            }
-
-            Text {
-              text: root.battery.changeRate && root.battery.changeRate !== 0 ? Math.abs(root.battery.changeRate).toFixed(1) + " W" : "N/A"
-              color: Color.mOnSurface
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              font.weight: Style.fontWeightSemiBold
-            }
+          MetricRow {
+            icon: "󱐋"
+            label: "Power"
+            value: root.battery.changeRate && root.battery.changeRate !== 0 ? Math.abs(root.battery.changeRate).toFixed(1) + " W" : "N/A"
+            valueColor: Color.mOnSurface
           }
 
           // Health
-          RowLayout {
-            Layout.fillWidth: true
-
-            Text {
-              text: "󰛨"
-              color: Color.mPrimary
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeL
-            }
-
-            Text {
-              text: "Health"
-              color: Color.mOnSurfaceVariant
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              Layout.fillWidth: true
-            }
-
-            Text {
-              text: root.battery.healthPercentage && root.battery.healthPercentage > 0 ? Math.round(root.battery.healthPercentage) + "%" : "N/A"
-              color: Color.mOnSurface
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              font.weight: Style.fontWeightSemiBold
-            }
+          MetricRow {
+            icon: "󰛨"
+            label: "Health"
+            value: root.battery.healthPercentage && root.battery.healthPercentage > 0 ? Math.round(root.battery.healthPercentage) + "%" : "N/A"
+            valueColor: Color.mOnSurface
           }
         }
       }
@@ -439,7 +360,6 @@ PanelPopup {
           battopProcess.running = true;
         }
       }
-    }
 
     // Animation
     scale: root.visible ? 1.0 : 0.95
@@ -449,14 +369,14 @@ PanelPopup {
     Behavior on scale {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
 
     Behavior on opacity {
       NumberAnimation {
         duration: Style.animationFast
-        easing.type: Easing.OutCubic
+        easing.type: Style.easingEnter
       }
     }
   }
