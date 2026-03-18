@@ -14,6 +14,9 @@ Item {
   // Wallpaper directory
   readonly property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
 
+  // Auto-change interval in seconds. Set to 0 to disable.
+  property int autoChangeInterval: 600
+
   // Dimensions
   implicitWidth: iconText.implicitWidth
   implicitHeight: Style.barHeight
@@ -53,6 +56,16 @@ Item {
   Process {
     id: wallpaperProcess
     command: [Settings.oNIgiRIBinDir + "niri-random-wallpaper"]
+  }
+
+  // Auto-rotation timer
+  Timer {
+    id: autoTimer
+    interval: autoChangeInterval * 1000
+    running: autoChangeInterval > 0
+    repeat: true
+    triggeredOnStart: false
+    onTriggered: wallpaperProcess.running = true
   }
 
   // Mouse interaction
