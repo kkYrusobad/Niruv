@@ -55,9 +55,13 @@ Item {
     searchText = "";
     selectedIndex = 0;
     searchInput.text = "";  // Clear search input
-    
-    // Refresh apps to pick up newly installed applications
-    ApplicationsService.refreshApplications();
+
+    // Keep startup lean: load on first open, refresh only when stale.
+    if (!ApplicationsService.isLoaded) {
+      ApplicationsService.ensureLoaded();
+    } else if ((Date.now() - ApplicationsService.lastLoadedAtMs) > 120000) {
+      ApplicationsService.refreshApplications();
+    }
     
     MenuService.reset();
     Qt.callLater(() => searchInput.forceActiveFocus());

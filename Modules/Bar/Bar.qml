@@ -13,6 +13,30 @@ Item {
   id: root
 
   property ShellScreen screen: null
+  readonly property var widgetCfg: (Settings.data.bar && Settings.data.bar.widgets) ? Settings.data.bar.widgets : null
+  readonly property var widgetDefaults: ({
+    media: true,
+    visualizer: false,
+    workspace: true,
+    systemMonitor: true,
+    activeWindow: true,
+    tray: true,
+    wallpaper: false,
+    wifi: true,
+    bluetooth: true,
+    screenRecorder: false,
+    volume: true,
+    brightness: true,
+    nightLight: false,
+    battery: true
+  })
+
+  function widgetEnabled(name) {
+    if (!root.widgetCfg || root.widgetCfg[name] === undefined || root.widgetCfg[name] === null) {
+      return !!root.widgetDefaults[name];
+    }
+    return !!root.widgetCfg[name];
+  }
 
   anchors.fill: parent
 
@@ -93,8 +117,8 @@ Item {
 
   // Shared Network Panel (for WiFi and Bluetooth widgets)
   NetworkPanel {
-    id: networkPanel
-    anchorItem: wifiWidget
+    id: sharedNetworkPanel
+    anchorItem: wifiWidgetLoader.item ? wifiWidgetLoader.item : (bluetoothWidgetLoader.item ? bluetoothWidgetLoader.item : networkAnchor)
     screen: root.screen
   }
 
@@ -161,23 +185,35 @@ Item {
   }
 
   // Media widget (anchored to the left of the clock)
-  Media {
-    id: mediaWidget
+  Loader {
+    id: mediaWidgetLoader
+    active: root.widgetEnabled("media")
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: clockArea.left
     anchors.rightMargin: Style.marginS
-    screen: root.screen
     z: 10
+
+    sourceComponent: Component {
+      Media {
+        screen: root.screen
+      }
+    }
   }
 
   // Visualizer widget (anchored to the right of the clock)
-  Visualizer {
-    id: visualizerWidget
+  Loader {
+    id: visualizerWidgetLoader
+    active: root.widgetEnabled("visualizer")
     anchors.verticalCenter: parent.verticalCenter
     anchors.left: clockArea.right
     anchors.leftMargin: Style.marginS
-    screen: root.screen
     z: 10
+
+    sourceComponent: Component {
+      Visualizer {
+        screen: root.screen
+      }
+    }
   }
 
 
@@ -198,20 +234,38 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Style.marginM
 
-        Workspace {
-          id: workspaceWidget
+        Loader {
+          id: workspaceWidgetLoader
+          active: root.widgetEnabled("workspace")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            Workspace {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
-        SystemMonitor {
+        Loader {
+          active: root.widgetEnabled("systemMonitor")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            SystemMonitor {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
-        ActiveWindow {
+        Loader {
+          active: root.widgetEnabled("activeWindow")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            ActiveWindow {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
       }
     }
@@ -232,61 +286,121 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Style.marginM
 
+        Item {
+          id: networkAnchor
+          width: 1
+          height: 1
+        }
+
         // System Tray (first - system apps)
-        Tray {
-          anchors.verticalCenter: parent.verticalCenter 
-          screen: root.screen
+        Loader {
+          active: root.widgetEnabled("tray")
+          anchors.verticalCenter: parent.verticalCenter
+          sourceComponent: Component {
+            Tray {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
         // Wallpaper widget
-        Wallpaper {
+        Loader {
+          active: root.widgetEnabled("wallpaper")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            Wallpaper {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
         // WiFi widget
-        WiFi {
-          id: wifiWidget
+        Loader {
+          id: wifiWidgetLoader
+          active: root.widgetEnabled("wifi")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
-          networkPanel: networkPanel
+          sourceComponent: Component {
+            WiFi {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+              networkPanel: sharedNetworkPanel
+            }
+          }
         }
 
         // Bluetooth widget
-        Bluetooth {
+        Loader {
+          id: bluetoothWidgetLoader
+          active: root.widgetEnabled("bluetooth")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
-          networkPanel: networkPanel
+          sourceComponent: Component {
+            Bluetooth {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+              networkPanel: sharedNetworkPanel
+            }
+          }
         }
 
         // Screen Recorder
-        ScreenRecorder {
+        Loader {
+          active: root.widgetEnabled("screenRecorder")
           anchors.verticalCenter: parent.verticalCenter
+          sourceComponent: Component {
+            ScreenRecorder {
+              anchors.verticalCenter: parent.verticalCenter
+            }
+          }
         }
 
         // Volume widget
-        Volume {
+        Loader {
+          active: root.widgetEnabled("volume")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            Volume {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
         // Brightness widget
-        Brightness {
+        Loader {
+          active: root.widgetEnabled("brightness")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            Brightness {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
         // Night Light widget
-        NightLight {
+        Loader {
+          active: root.widgetEnabled("nightLight")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            NightLight {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
         // Battery widget
-        Battery {
-          id: batteryWidget
+        Loader {
+          active: root.widgetEnabled("battery")
           anchors.verticalCenter: parent.verticalCenter
-          screen: root.screen
+          sourceComponent: Component {
+            Battery {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
+            }
+          }
         }
 
 

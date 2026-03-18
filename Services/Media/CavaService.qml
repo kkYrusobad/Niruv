@@ -11,8 +11,8 @@ import qs.Commons
 Singleton {
   id: root
 
-  // Always run cava for the bar visualizer
-  property bool shouldRun: true
+  // Run cava only when the visualizer feature is enabled.
+  property bool shouldRun: Settings.data.bar.widgets.visualizer
 
   property var values: Array(barsCount).fill(0)
   property int barsCount: 24
@@ -21,6 +21,14 @@ Singleton {
   property bool isIdle: true
   property int idleFrameCount: 0
   readonly property int idleThreshold: 30
+
+  onShouldRunChanged: {
+    if (!shouldRun) {
+      values = Array(barsCount).fill(0);
+      isIdle = true;
+      idleFrameCount = 0;
+    }
+  }
 
   // Cava config
   property var config: ({

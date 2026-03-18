@@ -17,6 +17,17 @@
 
 The name combines **Niri** + **Gruv**box, and references the Sanskrit word **निरव** (*nirav*) — meaning "quiet" or "silent" — reflecting the shell's minimal, unobtrusive design philosophy.
 
+## 🧠 Suckless-First Philosophy
+
+Niruv follows a practical "suckless" approach: keep behavior explicit, remove duplication first, and avoid abstractions that do not pay for themselves.
+
+- **One clear way to do things**: shared panel primitives and consistent popup behavior.
+- **Lazy by default**: optional/heavy widgets are loaded only when enabled.
+- **Fewer moving parts**: consolidated polling and service timers where possible.
+- **Backwards-safe evolution**: new settings include compatibility fallbacks for existing users.
+
+This keeps startup lighter, maintenance simpler, and feature parity intact.
+
 ## ✨ Features
 
 - 🎨 **Gruvbox Material Dark** color scheme
@@ -42,6 +53,14 @@ The name combines **Niri** + **Gruv**box, and references the Sanskrit word **न
 - 📺 **On-Screen Display (OSD)** visual feedback for volume/brightness/media changes
 - ⚡ **Power Profiles** switch between Performance/Balanced/Power Saver modes
 - 🔔 **System Tray** displays tray icons with right-click context menus
+
+### Minimal Architecture Highlights
+
+- Shared panel shell via `Commons/PanelPopup.qml` used across major panels.
+- Shared micro-components (`PanelActionButton`, `PanelStatusChip`, `PanelInfoPill`) reduce repeated QML blocks.
+- Single heartbeat stats polling in `Services/System/SystemStatService.qml`.
+- Launcher apps are lazily loaded and cached in `Services/System/ApplicationsService.qml`.
+- Bar widgets are toggleable through `bar.widgets` with loader-based instantiation in `Modules/Bar/Bar.qml`.
 
 ## 📚 Documentation
 

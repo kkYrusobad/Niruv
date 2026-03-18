@@ -12,42 +12,11 @@ import qs.Services.Power
  * BatteryPanel - Popup panel with detailed battery information
  * Shows: Battery percentage, time remaining, health, power rate, Bluetooth devices
  */
-PopupWindow {
+PanelPopup {
   id: root
 
-  property Item anchorItem: null
-  property ShellScreen screen: null
-
-  visible: false
-  color: "transparent"
-
-  // Position below the anchor item
-  anchor.item: anchorItem
-  anchor.rect.x: anchorItem ? (anchorItem.width - panelWidth) / 2 : 0
-  anchor.rect.y: anchorItem ? anchorItem.height + Style.marginS : 0
-
   property real panelWidth: 280
-
-  implicitWidth: panelContent.width
-  implicitHeight: panelContent.height
-
-  function toggle() {
-    if (visible) {
-      close();
-    } else {
-      open();
-    }
-  }
-
-  function open() {
-    PanelState.openPanel(root);
-    visible = true;
-  }
-
-  function close() {
-    visible = false;
-    PanelState.panelClosed(root);
-  }
+  panelContentItem: panelContent
 
   // Battery data
   readonly property var battery: UPower.displayDevice
@@ -232,55 +201,64 @@ PopupWindow {
       }
 
       // Bluetooth devices card
-      Rectangle {
+      Loader {
+        id: btDevicesLoader
         Layout.fillWidth: true
-        Layout.preferredHeight: btColumn.implicitHeight + Style.marginM * 2
-        radius: Style.radiusM
-        color: Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: Style.borderS
-        visible: BluetoothService.allDevicesWithBattery && BluetoothService.allDevicesWithBattery.length > 0
+        Layout.preferredHeight: item ? item.implicitHeight : 0
+        active: root.visible && BluetoothService.allDevicesWithBattery && BluetoothService.allDevicesWithBattery.length > 0
+        visible: active
 
-        ColumnLayout {
-          id: btColumn
-          anchors.fill: parent
-          anchors.margins: Style.marginM
-          spacing: Style.marginS
+        sourceComponent: Component {
+          Rectangle {
+            width: btDevicesLoader.width
+            implicitHeight: btColumn.implicitHeight + Style.marginM * 2
+            radius: Style.radiusM
+            color: Color.mSurfaceVariant
+            border.color: Color.mOutline
+            border.width: Style.borderS
 
-          // Header
-          RowLayout {
-            Layout.fillWidth: true
+            ColumnLayout {
+              id: btColumn
+              anchors.fill: parent
+              anchors.margins: Style.marginM
+              spacing: Style.marginS
 
-            Text {
-              text: "󰂯"
-              color: Color.mPrimary
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeL
-            }
-
-            Text {
-              text: "Bluetooth Devices"
-              color: Color.mOnSurface
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              font.weight: Style.fontWeightSemiBold
-              Layout.fillWidth: true
-            }
-          }
-
-          // Device list
-          Repeater {
-            model: BluetoothService.allDevicesWithBattery || []
-
-            RowLayout {
-              Layout.fillWidth: true
-
-              Text {
-                text: BluetoothService.getBattery(modelData)
-                color: Color.mOnSurfaceVariant
-                font.family: Style.fontFamily
-                font.pixelSize: Style.fontSizeS
+              // Header
+              RowLayout {
                 Layout.fillWidth: true
+
+                Text {
+                  text: "󰂯"
+                  color: Color.mPrimary
+                  font.family: Style.fontFamily
+                  font.pixelSize: Style.fontSizeL
+                }
+
+                Text {
+                  text: "Bluetooth Devices"
+                  color: Color.mOnSurface
+                  font.family: Style.fontFamily
+                  font.pixelSize: Style.fontSizeS
+                  font.weight: Style.fontWeightSemiBold
+                  Layout.fillWidth: true
+                }
+              }
+
+              // Device list
+              Repeater {
+                model: BluetoothService.allDevicesWithBattery || []
+
+                RowLayout {
+                  Layout.fillWidth: true
+
+                  Text {
+                    text: BluetoothService.getBattery(modelData)
+                    color: Color.mOnSurfaceVariant
+                    font.family: Style.fontFamily
+                    font.pixelSize: Style.fontSizeS
+                    Layout.fillWidth: true
+                  }
+                }
               }
             }
           }
@@ -451,43 +429,14 @@ PopupWindow {
       }
 
       // Open battop button
-      Rectangle {
+      PanelActionButton {
         Layout.fillWidth: true
-        Layout.preferredHeight: 36
-        radius: Style.radiusS
-        color: battopMouseArea.containsMouse ? Qt.alpha(Color.mPrimary, 0.2) : Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: Style.borderS
-
-        RowLayout {
-          anchors.centerIn: parent
-          spacing: Style.marginS
-
-          Text {
-            text: "󰄛"
-            color: Color.mPrimary
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeL
-          }
-
-          Text {
-            text: "Open Battery Monitor"
-            color: Color.mOnSurface
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeS
-            font.weight: Style.fontWeightMedium
-          }
-        }
-
-        MouseArea {
-          id: battopMouseArea
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: {
-            root.close();
-            battopProcess.running = true;
-          }
+        icon: "󰄛"
+        label: "Open Battery Monitor"
+        accentColor: Color.mPrimary
+        onClicked: {
+          root.close();
+          battopProcess.running = true;
         }
       }
     }

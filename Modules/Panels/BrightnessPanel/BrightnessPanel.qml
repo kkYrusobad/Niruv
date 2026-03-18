@@ -10,42 +10,11 @@ import qs.Services.System
  * BrightnessPanel - Popup panel with brightness and night light controls
  * Shows: Brightness slider, night light toggle section
  */
-PopupWindow {
+PanelPopup {
   id: root
 
-  property Item anchorItem: null
-  property ShellScreen screen: null
-
-  visible: false
-  color: "transparent"
-
-  // Position below the anchor item
-  anchor.item: anchorItem
-  anchor.rect.x: anchorItem ? (anchorItem.width - panelWidth) / 2 : 0
-  anchor.rect.y: anchorItem ? anchorItem.height + Style.marginS : 0
-
   property real panelWidth: 260
-
-  implicitWidth: panelContent.width
-  implicitHeight: panelContent.height
-
-  function toggle() {
-    if (visible) {
-      close();
-    } else {
-      open();
-    }
-  }
-
-  function open() {
-    PanelState.openPanel(root);
-    visible = true;
-  }
-
-  function close() {
-    visible = false;
-    PanelState.panelClosed(root);
-  }
+  panelContentItem: panelContent
 
   // Brightness state from BrightnessService
   readonly property real brightness: BrightnessService.brightness
@@ -254,27 +223,16 @@ PopupWindow {
             }
 
             // State chip
-            Rectangle {
-              Layout.preferredWidth: stateText.implicitWidth + Style.marginS * 2
-              Layout.preferredHeight: 22
-              radius: 11
-              color: {
+            PanelStatusChip {
+              label: NightLightService.getStateLabel()
+              backgroundColor: {
                 if (!NightLightService.enabled) return Color.mOutline;
                 if (NightLightService.forced) return Color.mOrange;
                 return Color.mTertiary;
               }
-
-              Text {
-                id: stateText
-                anchors.centerIn: parent
-                text: NightLightService.getStateLabel()
-                color: {
-                  if (!NightLightService.enabled) return Color.mOnSurfaceVariant;
-                  return Color.mSurface;
-                }
-                font.family: Style.fontFamily
-                font.pixelSize: Style.fontSizeXS
-                font.weight: Style.fontWeightMedium
+              foregroundColor: {
+                if (!NightLightService.enabled) return Color.mOnSurfaceVariant;
+                return Color.mSurface;
               }
             }
           }

@@ -10,6 +10,8 @@ Niruv stores its configuration in the standard XDG config directory:
 
 The shell will automatically create this file with default values on the first run.
 
+When upgrading from an older `settings.json`, Niruv will migrate missing keys (for example `bar.widgets`) by writing the new defaults on load.
+
 ### Settings Structure
 
 The `settings.json` file follows this structure:
@@ -21,7 +23,23 @@ The `settings.json` file follows this structure:
         "density": "default",
         "enabled": true,
         "position": "top",
-        "showCapsule": true
+        "showCapsule": true,
+        "widgets": {
+            "activeWindow": true,
+            "battery": true,
+            "bluetooth": true,
+            "brightness": true,
+            "media": true,
+            "nightLight": false,
+            "screenRecorder": false,
+            "systemMonitor": true,
+            "tray": true,
+            "visualizer": false,
+            "volume": true,
+            "wallpaper": false,
+            "wifi": true,
+            "workspace": true
+        }
     },
     "general": {
         "animationDisabled": false,
@@ -38,6 +56,42 @@ The `settings.json` file follows this structure:
 ## 🖥️ Bar Configuration
 
 You can customize the position and density of the bar.
+
+### Widget Toggles
+
+Use `bar.widgets` to enable or disable individual widgets without removing functionality from the shell.
+
+Available widget keys:
+
+- `workspace`
+- `systemMonitor`
+- `activeWindow`
+- `tray`
+- `wallpaper`
+- `wifi`
+- `bluetooth`
+- `screenRecorder`
+- `volume`
+- `brightness`
+- `nightLight`
+- `battery`
+- `media`
+- `visualizer`
+
+Example: disable heavy widgets for a lean setup
+
+```json
+{
+    "bar": {
+        "widgets": {
+            "visualizer": false,
+            "wallpaper": false,
+            "screenRecorder": false,
+            "media": true
+        }
+    }
+}
+```
 
 ### Position
 

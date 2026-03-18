@@ -22,18 +22,22 @@ Singleton {
 
   // Loading state
   property bool isLoaded: false
+  property double lastLoadedAtMs: 0
+  property var filterCache: ({})
 
-  Component.onCompleted: {
-    Logger.d("ApplicationsService", "Service initialized");
-    // Delay loading to allow DesktopEntries to become available
-    loadTimer.start();
-  }
+  Component.onCompleted: Logger.d("ApplicationsService", "Service initialized")
 
   Timer {
     id: loadTimer
     interval: 100
     repeat: false
     onTriggered: loadApplications()
+  }
+
+  function ensureLoaded() {
+    if (isLoaded || loadTimer.running) return;
+    loadTimer.interval = 100;
+    loadTimer.start();
   }
 
   // Simple contains match for performance
@@ -56,13 +60,27 @@ Singleton {
 
   // Filter apps based on search query
   function filterApps(query) {
+    ensureLoaded();
+
+    if (!isLoaded) {
+      filteredApps = [];
+      return;
+    }
+
     searchQuery = query;
     if (!query || query.trim() === "") {
       filteredApps = allApps.slice(0, 50); // Show first 50 apps when no query
+      filterCache[""] = filteredApps;
       return;
     }
 
     const q = query.trim();
+    const cacheKey = q.toLowerCase();
+    if (filterCache[cacheKey] !== undefined) {
+      filteredApps = filterCache[cacheKey];
+      return;
+    }
+
     let results = [];
 
     // First pass: contains match (faster)
@@ -100,10 +118,12 @@ Singleton {
     }
 
     filteredApps = results;
+    filterCache[cacheKey] = results;
   }
 
   // Clear filter and reload apps
   function clearFilter() {
+    ensureLoaded();
     searchQuery = "";
     filteredApps = allApps.slice(0, 50);
   }
@@ -112,6 +132,7 @@ Singleton {
   function refreshApplications() {
     Logger.i("ApplicationsService", "Refreshing applications list...");
     isLoaded = false;
+    filterCache = ({});
     allApps = [];
     filteredApps = [];
     loadApplications();
@@ -163,6 +184,7 @@ Singleton {
 
     // Filter and transform apps
     allApps = [];
+    filterCache = ({});
     for (let i = 0; i < apps.length; i++) {
       const app = apps[i];
       if (!app || app.noDisplay) continue;
@@ -194,6 +216,7 @@ Singleton {
     // Initialize filtered apps
     filteredApps = allApps.slice(0, 50);
     isLoaded = true;
+    lastLoadedAtMs = Date.now();
 
     Logger.i("ApplicationsService", "Loaded " + allApps.length + " applications");
   }

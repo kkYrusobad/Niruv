@@ -43,44 +43,19 @@ Singleton {
   }
 
   // --------------------------------------------
-  // Timer for CPU usage
+  // Single heartbeat for all periodic stats updates.
   Timer {
-    id: cpuUsageTimer
+    id: pollTimer
     interval: root.pollingIntervalMs
     repeat: true
     running: true
     triggeredOnStart: true
-    onTriggered: cpuStatFile.reload()
-  }
-
-  // Timer for CPU temperature
-  Timer {
-    id: cpuTempTimer
-    interval: root.pollingIntervalMs
-    repeat: true
-    running: true
-    triggeredOnStart: true
-    onTriggered: updateCpuTemperature()
-  }
-
-  // Timer for memory stats
-  Timer {
-    id: memoryTimer
-    interval: root.pollingIntervalMs
-    repeat: true
-    running: true
-    triggeredOnStart: true
-    onTriggered: memInfoFile.reload()
-  }
-
-  // Timer for load average
-  Timer {
-    id: loadTimer
-    interval: root.pollingIntervalMs
-    repeat: true
-    running: true
-    triggeredOnStart: true
-    onTriggered: loadAvgFile.reload()
+    onTriggered: {
+      cpuStatFile.reload();
+      memInfoFile.reload();
+      loadAvgFile.reload();
+      updateCpuTemperature();
+    }
   }
 
   // --------------------------------------------
@@ -126,6 +101,8 @@ Singleton {
         root.cpuTempSensorName = name;
         root.cpuTempHwmonPath = `/sys/class/hwmon/hwmon${currentIndex}`;
         Logger.i("SystemStat", `Found ${root.cpuTempSensorName} CPU thermal sensor at ${root.cpuTempHwmonPath}`);
+        // Prime temperature immediately instead of waiting for next heartbeat.
+        root.updateCpuTemperature();
       } else {
         currentIndex++;
         Qt.callLater(() => checkNext());

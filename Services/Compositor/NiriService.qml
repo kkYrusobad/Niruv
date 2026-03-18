@@ -11,10 +11,22 @@ Item {
   id: root
 
   property ListModel workspaces: ListModel {}
+  property bool eventStreamSubscribed: false
+  property bool isInitialized: false
+  property int reconnectDelayMs: 1000
+  readonly property int maxReconnectDelayMs: 15000
 
   signal workspacesUpdated
 
   function initialize() {
+    if (isInitialized) return;
+    isInitialized = true;
+
+    if (!Quickshell.env("NIRI_SOCKET")) {
+      Logger.w("NiriService", "NIRI_SOCKET is not set; compositor IPC disabled");
+      return;
+    }
+
     niriEventStream.connected = true;
     niriCommandSocket.connected = true;
 
@@ -24,12 +36,19 @@ Item {
   }
 
   function sendSocketCommand(sock, command) {
+    if (!sock.connected) {
+      scheduleReconnect();
+      return;
+    }
+
     sock.write(JSON.stringify(command) + "\n");
     sock.flush();
   }
 
   function startEventStream() {
+    if (eventStreamSubscribed) return;
     sendSocketCommand(niriEventStream, "EventStream");
+    eventStreamSubscribed = true;
   }
 
   function updateWorkspaces() {
@@ -74,11 +93,45 @@ Item {
     }
   }
 
+  function scheduleReconnect() {
+    if (!isInitialized || reconnectTimer.running) return;
+    reconnectTimer.interval = reconnectDelayMs;
+    reconnectTimer.start();
+    reconnectDelayMs = Math.min(reconnectDelayMs * 2, maxReconnectDelayMs);
+  }
+
+  function reconnectNow() {
+    if (!isInitialized) return;
+    niriCommandSocket.connected = false;
+    niriEventStream.connected = false;
+    eventStreamSubscribed = false;
+
+    niriCommandSocket.connected = true;
+    niriEventStream.connected = true;
+
+    startEventStream();
+    updateWorkspaces();
+  }
+
+  Timer {
+    id: reconnectTimer
+    repeat: false
+    onTriggered: reconnectNow()
+  }
+
   // Command socket for requests
   Socket {
     id: niriCommandSocket
     path: Quickshell.env("NIRI_SOCKET")
     connected: false
+
+    onConnectedChanged: {
+      if (!connected) {
+        scheduleReconnect();
+      } else {
+        reconnectDelayMs = 1000;
+      }
+    }
 
     parser: SplitParser {
       onRead: function (line) {
@@ -105,6 +158,16 @@ Item {
     id: niriEventStream
     path: Quickshell.env("NIRI_SOCKET")
     connected: false
+
+    onConnectedChanged: {
+      if (!connected) {
+        eventStreamSubscribed = false;
+        scheduleReconnect();
+      } else {
+        reconnectDelayMs = 1000;
+        startEventStream();
+      }
+    }
 
     parser: SplitParser {
       onRead: data => {

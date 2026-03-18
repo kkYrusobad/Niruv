@@ -9,42 +9,11 @@ import qs.Commons
  * MediaPanel - Popup panel with full media controls
  * Shows: Album art, track info, playback controls, volume slider
  */
-PopupWindow {
+PanelPopup {
   id: root
 
-  property Item anchorItem: null
-  property ShellScreen screen: null
-
-  visible: false
-  color: "transparent"
-
-  // Position below the anchor item
-  anchor.item: anchorItem
-  anchor.rect.x: anchorItem ? (anchorItem.width - panelWidth) / 2 : 0
-  anchor.rect.y: anchorItem ? anchorItem.height + Style.marginS : 0
-
   property real panelWidth: 320
-
-  implicitWidth: panelContent.width
-  implicitHeight: panelContent.height
-
-  function toggle() {
-    if (visible) {
-      close();
-    } else {
-      open();
-    }
-  }
-
-  function open() {
-    PanelState.openPanel(root);
-    visible = true;
-  }
-
-  function close() {
-    visible = false;
-    PanelState.panelClosed(root);
-  }
+  panelContentItem: panelContent
 
   // Current MPRIS player
   readonly property var currentPlayer: {
@@ -106,27 +75,33 @@ PopupWindow {
     clip: true
 
     // Album art background (blurred effect via scaling)
-    Image {
-      id: bgAlbumArt
+    Loader {
+      id: bgAlbumArtLoader
       anchors.fill: parent
-      anchors.margins: -20  // Extend beyond borders for blur effect
-      source: root.albumArt
-      fillMode: Image.PreserveAspectCrop
-      visible: root.albumArt !== ""
-      opacity: 1.0
-      
-      // Scaling down and up creates soft blur effect
-      sourceSize.width: 100
-      sourceSize.height: 100
-      smooth: true
-      mipmap: true
+      active: root.visible && root.albumArt !== ""
+
+      sourceComponent: Component {
+        Image {
+          anchors.fill: parent
+          anchors.margins: -20  // Extend beyond borders for blur effect
+          source: root.albumArt
+          fillMode: Image.PreserveAspectCrop
+          opacity: 1.0
+
+          // Scaling down and up creates soft blur effect
+          sourceSize.width: 100
+          sourceSize.height: 100
+          smooth: true
+          mipmap: true
+        }
+      }
     }
 
     // Semi-transparent overlay for readability
     Rectangle {
       anchors.fill: parent
       color: Color.mSurface
-      opacity: root.albumArt !== "" ? 0.65 : 1.0
+      opacity: bgAlbumArtLoader.active ? 0.65 : 1.0
       
       Behavior on opacity {
         NumberAnimation { duration: Style.animationNormal }

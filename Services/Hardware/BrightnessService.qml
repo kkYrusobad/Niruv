@@ -40,7 +40,7 @@ Singleton {
   // Poll for external brightness changes (from function keys or brightnessctl)
   Timer {
     id: pollTimer
-    interval: 100
+    interval: 400
     repeat: true
     running: root.available
     onTriggered: refreshBrightness()
@@ -53,7 +53,9 @@ Singleton {
 
   // Refresh brightness from system
   function refreshBrightness() {
-    refreshProcess.running = true;
+    if (!refreshProcess.running) {
+      refreshProcess.running = true;
+    }
   }
 
   // Get current brightness

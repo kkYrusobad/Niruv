@@ -30,6 +30,17 @@ The `Style` singleton defines standard dimensions and animations:
 - **Radii**: `Style.radiusXS` (8px), `Style.radiusS` (12px), `Style.radiusM` (16px).
 - **Animations**: `Style.animationFast` (150ms), `Style.animationNormal` (300ms).
 
+## 🧱 Shared Panel Primitives
+
+To keep panel code minimal and consistent, Niruv uses small shared primitives:
+
+- `PanelPopup`: shared popup shell (anchor, lifecycle, implicit sizing).
+- `PanelActionButton`: standard action rows used by multiple panels.
+- `PanelStatusChip`: compact status badges (OFF/CONNECTED/IDLE).
+- `PanelInfoPill`: tiny informational pills for secondary state hints.
+
+These primitives are intentionally small and explicit to preserve a suckless architecture.
+
 ## 🧩 Widgets
 
 ### Battery Widget
@@ -175,6 +186,8 @@ Network connectivity widgets with shared **NetworkPanel**.
 - **NetworkPanel Features**:
   - WiFi section: Toggle switch, SSID, "WiFi Settings" button (opens impala TUI)
   - Bluetooth section: Toggle switch, device name, "Bluetooth Settings" button (opens bluetui TUI)
+  - Summary card: connection health + manual refresh + last update time
+  - Status chips and info pills for clearer radio/link/device state
 
 ### Night Light Widget
 
@@ -195,6 +208,12 @@ All popup panels share consistent behavior:
 - **Auto-Close on New Panel**: Opening a new panel automatically closes any open panel
 - **Smooth Animations**: Scale and fade animations on open/close
 - **PanelState Singleton**: Centralized tracking via `Commons/PanelState.qml`
+
+## ⚡ Performance Notes
+
+- Bar widgets can be enabled/disabled via `Settings.data.bar.widgets`.
+- Optional/heavy panel sections are lazy-loaded when panels become visible.
+- Visualizer process runtime is tied to widget enablement.
 
 ## 📺 On-Screen Display (OSD)
 

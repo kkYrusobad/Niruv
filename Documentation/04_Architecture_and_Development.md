@@ -2,6 +2,24 @@
 
 This document outlines the internal structure of Niruv and provides guidelines for contributors.
 
+## 🪶 Suckless-First Architecture
+
+Niruv follows a strict minimal architecture policy:
+
+- **Keep functionality, reduce structure**: remove duplication and indirection before adding new abstractions.
+- **One primitive per repeated pattern**: if the same UI block appears across panels, extract a tiny shared component.
+- **Lazy by default**: expensive UI trees and processes should only exist when visible or explicitly enabled.
+- **Prefer explicit wiring**: avoid framework-like helper layers that hide behavior.
+- **Measure impact**: optimize startup path, idle CPU, and code size without dropping user-facing features.
+
+Recent examples in-tree:
+
+- `Commons/PanelPopup.qml`: shared popup shell and panel lifecycle.
+- `Commons/PanelActionButton.qml`, `Commons/PanelStatusChip.qml`, `Commons/PanelInfoPill.qml`: small reusable panel primitives.
+- Loader-based widget creation in `Modules/Bar/Bar.qml` via `Settings.data.bar.widgets`.
+- Deferred panel subtrees in heavy panels (device lists, album-art background).
+- Consolidated polling in `Services/System/SystemStatService.qml`.
+
 ## 🏗️ Project Structure
 
 The project is organized into modular components:
@@ -58,6 +76,9 @@ Popup panels provide detailed information when clicking on bar widgets:
 - **MediaPanel**: Full media player controls with album art
 - **SystemMonitorPanel**: Detailed CPU/RAM/Temp/Load with progress bars
 
+Panel modules should share primitives and avoid repeated inline blocks when possible.
+Use `PanelPopup` for popup roots and keep panel internals focused on feature-specific content.
+
 ### Cards (`Modules/Cards/`)
 
 Reusable card components used within panels:
@@ -80,6 +101,8 @@ Reusable card components used within panels:
 - **Naming**: Use `PascalCase` for components and `camelCase` for properties/functions.
 - **Colors**: Always use `Color.mXxx` properties. Never hardcode hex values in widgets.
 - **Logging**: Use `Logger` instead of `console.log`.
+- **Abstractions**: Extract only when it removes clear repetition in at least two places.
+- **Loading strategy**: Prefer `Loader` for optional/heavy widgets and panel subsections.
 
 ### Debugging
 

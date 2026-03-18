@@ -8,39 +8,16 @@ import qs.Commons
  * NetworkPanel - Combined WiFi and Bluetooth popup panel
  * Shows: WiFi status + toggle, Bluetooth status + toggle, TUI launcher buttons
  */
-PopupWindow {
+PanelPopup {
   id: root
 
-  property Item anchorItem: null
-  property ShellScreen screen: null
-
-  visible: false
-  color: "transparent"
-
-  // Position below the anchor item
-  anchor.item: anchorItem
-  anchor.rect.x: anchorItem ? (anchorItem.width - panelWidth) / 2 : 0
-  anchor.rect.y: anchorItem ? anchorItem.height + Style.marginS : 0
-
   property real panelWidth: 280
-
-  implicitWidth: panelContent.width
-  implicitHeight: panelContent.height
-
-  function toggle() {
-    if (visible) {
-      close();
-    } else {
-      open();
-    }
-  }
+  panelContentItem: panelContent
 
   function open() {
     PanelState.openPanel(root);
     visible = true;
-    // Refresh status when opening
-    wifiStatusProcess.running = true;
-    btStatusProcess.running = true;
+    refreshStatus();
   }
 
   function close() {
@@ -59,6 +36,24 @@ PopupWindow {
   property string btDevice: ""
   readonly property bool btConnected: btState === "connected" && btDevice !== ""
   readonly property bool btOff: btState === "off"
+  readonly property bool anyConnected: wifiConnected || btConnected
+  readonly property bool allRadiosOff: wifiOff && btOff
+  property string lastRefreshLabel: "--:--"
+
+  function refreshStatus() {
+    wifiStatusProcess.running = true;
+    btStatusProcess.running = true;
+
+    const now = new Date();
+    lastRefreshLabel = now.toLocaleTimeString(Qt.locale(), "hh:mm:ss");
+  }
+
+  Timer {
+    interval: 10000
+    running: root.visible
+    repeat: true
+    onTriggered: refreshStatus()
+  }
 
   // === WiFi Status Polling ===
   Process {
@@ -172,6 +167,82 @@ PopupWindow {
       anchors.margins: Style.marginL
       spacing: Style.marginM
 
+      // Summary
+      Rectangle {
+        Layout.fillWidth: true
+        Layout.preferredHeight: 72
+        radius: Style.radiusM
+        color: Color.mSurfaceVariant
+        border.color: Color.mOutline
+        border.width: Style.borderS
+
+        RowLayout {
+          anchors.fill: parent
+          anchors.margins: Style.marginM
+          spacing: Style.marginM
+
+          Rectangle {
+            Layout.preferredWidth: 34
+            Layout.preferredHeight: 34
+            radius: 17
+            color: root.anyConnected ? Color.mBlue : Color.mOutline
+
+            Text {
+              anchors.centerIn: parent
+              text: root.anyConnected ? "󰤨" : "󰤭"
+              color: root.anyConnected ? Color.mOnPrimary : Color.mOnSurfaceVariant
+              font.family: Style.fontFamily
+              font.pixelSize: 16
+            }
+          }
+
+          Column {
+            Layout.fillWidth: true
+            spacing: 1
+
+            Text {
+              text: root.allRadiosOff ? "Wireless Disabled" : (root.anyConnected ? "Network Connected" : "No Active Connection")
+              color: Color.mOnSurface
+              font.family: Style.fontFamily
+              font.pixelSize: Style.fontSizeM
+              font.weight: Style.fontWeightBold
+            }
+
+            Text {
+              text: "Updated " + root.lastRefreshLabel
+              color: Color.mOnSurfaceVariant
+              font.family: Style.fontFamily
+              font.pixelSize: Style.fontSizeXS
+            }
+          }
+
+          Rectangle {
+            Layout.preferredWidth: 34
+            Layout.preferredHeight: 34
+            radius: 17
+            color: refreshMouse.containsMouse ? Qt.alpha(Color.mBlue, 0.25) : Qt.alpha(Color.mBlue, 0.12)
+            border.color: Qt.alpha(Color.mBlue, 0.4)
+            border.width: 1
+
+            Text {
+              anchors.centerIn: parent
+              text: "󰑐"
+              color: Color.mBlue
+              font.family: Style.fontFamily
+              font.pixelSize: Style.fontSizeM
+            }
+
+            MouseArea {
+              id: refreshMouse
+              anchors.fill: parent
+              hoverEnabled: true
+              cursorShape: Qt.PointingHandCursor
+              onClicked: root.refreshStatus()
+            }
+          }
+        }
+      }
+
       // === WiFi Section ===
       Rectangle {
         Layout.fillWidth: true
@@ -212,7 +283,7 @@ PopupWindow {
 
               Text {
                 text: {
-                  if (root.wifiOff) return "Off";
+                  if (root.wifiOff) return "Radio is off";
                   if (root.wifiConnected) return root.wifiSsid;
                   return "Not connected";
                 }
@@ -220,6 +291,12 @@ PopupWindow {
                 font.family: Style.fontFamily
                 font.pixelSize: Style.fontSizeS
               }
+            }
+
+            PanelStatusChip {
+              label: root.wifiOff ? "OFF" : (root.wifiConnected ? "CONNECTED" : "IDLE")
+              backgroundColor: root.wifiOff ? Color.mOutline : (root.wifiConnected ? Color.mBlue : Qt.alpha(Color.mBlue, 0.25))
+              foregroundColor: root.wifiOff ? Color.mOnSurfaceVariant : (root.wifiConnected ? Color.mOnPrimary : Color.mBlue)
             }
 
             // Toggle button
@@ -253,44 +330,32 @@ PopupWindow {
             }
           }
 
-          // Open WiFi settings button
-          Rectangle {
+          RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 32
-            radius: Style.radiusS
-            color: wifiSettingsMouseArea.containsMouse ? Qt.alpha(Color.mBlue, 0.2) : "transparent"
-            border.color: Color.mOutline
-            border.width: Style.borderS
+            spacing: Style.marginS
 
-            RowLayout {
-              anchors.centerIn: parent
-              spacing: Style.marginS
-
-              Text {
-                text: "󰛳"
-                color: Color.mBlue
-                font.family: Style.fontFamily
-                font.pixelSize: Style.fontSizeM
-              }
-
-              Text {
-                text: "WiFi Settings"
-                color: Color.mOnSurface
-                font.family: Style.fontFamily
-                font.pixelSize: Style.fontSizeS
-                font.weight: Style.fontWeightMedium
-              }
+            PanelInfoPill {
+              Layout.fillWidth: true
+              label: "Radio: " + (root.wifiOff ? "Off" : "On")
             }
 
-            MouseArea {
-              id: wifiSettingsMouseArea
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              onClicked: {
-                root.close();
-                wifiTuiProcess.running = true;
-              }
+            PanelInfoPill {
+              Layout.fillWidth: true
+              label: root.wifiConnected ? "Link: Active" : "Link: Inactive"
+            }
+          }
+
+          // Open WiFi settings button
+          PanelActionButton {
+            Layout.fillWidth: true
+            compact: true
+            icon: "󰛳"
+            label: "WiFi Settings"
+            accentColor: Color.mBlue
+            baseColor: "transparent"
+            onClicked: {
+              root.close();
+              wifiTuiProcess.running = true;
             }
           }
         }
@@ -336,7 +401,7 @@ PopupWindow {
 
               Text {
                 text: {
-                  if (root.btOff) return "Off";
+                  if (root.btOff) return "Radio is off";
                   if (root.btConnected) return root.btDevice;
                   return "Not connected";
                 }
@@ -344,6 +409,12 @@ PopupWindow {
                 font.family: Style.fontFamily
                 font.pixelSize: Style.fontSizeS
               }
+            }
+
+            PanelStatusChip {
+              label: root.btOff ? "OFF" : (root.btConnected ? "CONNECTED" : "IDLE")
+              backgroundColor: root.btOff ? Color.mOutline : (root.btConnected ? Color.mBlue : Qt.alpha(Color.mBlue, 0.25))
+              foregroundColor: root.btOff ? Color.mOnSurfaceVariant : (root.btConnected ? Color.mOnPrimary : Color.mBlue)
             }
 
             // Toggle button
@@ -377,47 +448,45 @@ PopupWindow {
             }
           }
 
-          // Open Bluetooth settings button
-          Rectangle {
+          RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 32
-            radius: Style.radiusS
-            color: btSettingsMouseArea.containsMouse ? Qt.alpha(Color.mBlue, 0.2) : "transparent"
-            border.color: Color.mOutline
-            border.width: Style.borderS
+            spacing: Style.marginS
 
-            RowLayout {
-              anchors.centerIn: parent
-              spacing: Style.marginS
-
-              Text {
-                text: "󰀂"
-                color: Color.mBlue
-                font.family: Style.fontFamily
-                font.pixelSize: Style.fontSizeM
-              }
-
-              Text {
-                text: "Bluetooth Settings"
-                color: Color.mOnSurface
-                font.family: Style.fontFamily
-                font.pixelSize: Style.fontSizeS
-                font.weight: Style.fontWeightMedium
-              }
+            PanelInfoPill {
+              Layout.fillWidth: true
+              label: "Power: " + (root.btOff ? "Off" : "On")
             }
 
-            MouseArea {
-              id: btSettingsMouseArea
-              anchors.fill: parent
-              hoverEnabled: true
-              cursorShape: Qt.PointingHandCursor
-              onClicked: {
-                root.close();
-                btTuiProcess.running = true;
-              }
+            PanelInfoPill {
+              Layout.fillWidth: true
+              label: root.btConnected ? "Device: Active" : "Device: None"
+            }
+          }
+
+          // Open Bluetooth settings button
+          PanelActionButton {
+            Layout.fillWidth: true
+            compact: true
+            icon: "󰀂"
+            label: "Bluetooth Settings"
+            accentColor: Color.mBlue
+            baseColor: "transparent"
+            onClicked: {
+              root.close();
+              btTuiProcess.running = true;
             }
           }
         }
+      }
+
+      Text {
+        Layout.fillWidth: true
+        text: "Tip: Toggle radios here, open full TUI tools for scanning and pairing."
+        color: Qt.alpha(Color.mOnSurfaceVariant, 0.85)
+        font.family: Style.fontFamily
+        font.pixelSize: Style.fontSizeXS
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
       }
     }
 

@@ -13,6 +13,22 @@
     "position": "top",
     "density": "default",
     "showCapsule": true,
-    "capsuleOpacity": 0.5
+    "capsuleOpacity": 0.5,
+    "widgets": {
+      "media": true,
+      "visualizer": true,
+      "workspace": true,
+      "systemMonitor": true,
+      "activeWindow": true,
+      "tray": true,
+      "wallpaper": false,
+      "wifi": true,
+      "bluetooth": true,
+      "screenRecorder": false,
+      "volume": true,
+      "brightness": true,
+      "nightLight": false,
+      "battery": true
+    }
   }
 }

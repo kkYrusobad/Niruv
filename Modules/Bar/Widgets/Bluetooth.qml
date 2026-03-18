@@ -25,7 +25,7 @@ Item {
   readonly property bool isConnected: btState === "connected" && connectedDevice !== ""
   readonly property bool isOff: btState === "off"
   readonly property string displayText: {
-    if (isOff) return "Off";
+    if (isOff) return "Link Down";
     if (isConnected) return connectedDevice;
     return "Disconnected";
   }
@@ -125,7 +125,7 @@ Item {
       text: root.btIconText
       color: {
         if (mouseArea.containsMouse) return Color.mOnPrimary;
-        if (root.isOff) return Color.mOutline;
+        if (root.isOff) return Color.mOnSurface;
         return Color.mOnSurface;
       }
       font.family: Style.fontFamily

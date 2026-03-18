@@ -5,3 +5,7 @@ singleton Logger 1.0 Logger.qml
 singleton Time 1.0 Time.qml
 singleton Settings 1.0 Settings.qml
 singleton PanelState 1.0 PanelState.qml
+PanelPopup 1.0 PanelPopup.qml
+PanelActionButton 1.0 PanelActionButton.qml
+PanelStatusChip 1.0 PanelStatusChip.qml
+PanelInfoPill 1.0 PanelInfoPill.qml

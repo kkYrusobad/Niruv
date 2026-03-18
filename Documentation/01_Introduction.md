@@ -7,6 +7,8 @@ The name **Niruv** is a portmanteau of **Niri** and **Gruv**box, and also refere
 ## ✨ Key Features
 
 - **Minimalist Design**: A clean, distraction-free interface that stays out of your way.
+- **Suckless Architecture**: Shared micro-primitives and explicit wiring over layered abstractions.
+- **Lean by Default**: Optional/heavy widgets can be disabled while keeping all features available.
 - **Gruvbox Material Theme**: Built from the ground up with the warm, retro-inspired Gruvbox Material Dark color scheme.
 - **Responsive Bar**: A modular top bar containing essential widgets like workspaces, clock, media, and battery.
 - **Interactive Widgets**:

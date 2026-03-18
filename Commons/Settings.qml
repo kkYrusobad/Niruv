@@ -95,6 +95,17 @@ Singleton {
     id: settingsFileView
     watchChanges: true
     printErrors: true
+
+    function migrateSchemaIfNeeded() {
+      const raw = text();
+      if (!raw || !raw.length) return;
+
+      // Legacy settings.json files may miss newer nested defaults like bar.widgets.
+      if (raw.indexOf('"widgets"') === -1) {
+        Logger.i("Settings", "Migrating settings schema: adding missing bar.widgets defaults");
+        save();
+      }
+    }
     
     // When the file changes on disk, reload into adapter
     onFileChanged: reload()
@@ -107,6 +118,8 @@ Singleton {
         Logger.i("Settings", "Settings loaded from " + settingsFile);
         root.isSettingsLoaded = true;
       }
+
+      migrateSchemaIfNeeded();
     }
 
     onLoadFailed: function(error) {
@@ -143,6 +156,23 @@ Singleton {
       property string density: "default"
       property bool showCapsule: true
       property real capsuleOpacity: 0.5
+
+      property JsonObject widgets: JsonObject {
+        property bool media: true
+        property bool visualizer: false
+        property bool workspace: true
+        property bool systemMonitor: true
+        property bool activeWindow: true
+        property bool tray: true
+        property bool wallpaper: false
+        property bool wifi: true
+        property bool bluetooth: true
+        property bool screenRecorder: false
+        property bool volume: true
+        property bool brightness: true
+        property bool nightLight: false
+        property bool battery: true
+      }
     }
   }
 }

@@ -59,123 +59,32 @@ Item {
     anchors.centerIn: parent
     spacing: Style.marginS
 
-    // CPU Usage
-    Row {
-      spacing: 2
-      anchors.verticalCenter: parent.verticalCenter
-
-      Text {
-        text: "󰘚"
-        color: mouseArea.containsMouse ? Color.mOnPrimary : (SystemStatService.cpuUsage > 80 ? Color.mError : Color.mBlue)
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeL
-        anchors.verticalCenter: parent.verticalCenter
-
-        Behavior on color {
-          ColorAnimation { duration: Style.animationFast }
-        }
-      }
-
-      Text {
-        text: Math.round(SystemStatService.cpuUsage) + "%"
-        color: mouseArea.containsMouse ? Color.mOnPrimary : Color.mOnSurface
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeS
-        font.weight: Style.fontWeightMedium
-        anchors.verticalCenter: parent.verticalCenter
-
-        Behavior on color {
-          ColorAnimation { duration: Style.animationFast }
-        }
-      }
+    SystemMonitorStat {
+      icon: "󰘚"
+      value: Math.round(SystemStatService.cpuUsage) + "%"
+      hovered: mouseArea.containsMouse
+      danger: SystemStatService.cpuUsage > 80
     }
 
-    // RAM Usage
-    Row {
-      spacing: 2
-      anchors.verticalCenter: parent.verticalCenter
-
-      Text {
-        text: ""
-        color: mouseArea.containsMouse ? Color.mOnPrimary : (SystemStatService.memPercent > 80 ? Color.mError : Color.mBlue)
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeL
-        anchors.verticalCenter: parent.verticalCenter
-      }
-
-      Text {
-        text: Math.round(SystemStatService.memPercent) + "%"
-        color: mouseArea.containsMouse ? Color.mOnPrimary : Color.mOnSurface
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeS
-        font.weight: Style.fontWeightMedium
-        anchors.verticalCenter: parent.verticalCenter
-
-        Behavior on color {
-          ColorAnimation { duration: Style.animationFast }
-        }
-      }
+    SystemMonitorStat {
+      icon: ""
+      value: Math.round(SystemStatService.memPercent) + "%"
+      hovered: mouseArea.containsMouse
+      danger: SystemStatService.memPercent > 80
     }
 
-    // CPU Temperature
-    Row {
-      spacing: 2
-      anchors.verticalCenter: parent.verticalCenter
+    SystemMonitorStat {
+      icon: ""
+      value: Math.round(SystemStatService.cpuTemp) + "°"
+      hovered: mouseArea.containsMouse
+      danger: SystemStatService.cpuTemp > 80
       visible: SystemStatService.cpuTemp > 0
-
-      Text {
-        text: ""
-        color: mouseArea.containsMouse ? Color.mOnPrimary : (SystemStatService.cpuTemp > 80 ? Color.mError : Color.mBlue)
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeL
-        anchors.verticalCenter: parent.verticalCenter
-
-        Behavior on color {
-          ColorAnimation {
-            duration: Style.animationFast
-          }
-        }
-      }
-
-      Text {
-        text: Math.round(SystemStatService.cpuTemp) + "°"
-        color: mouseArea.containsMouse ? Color.mOnPrimary : Color.mOnSurface
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeS
-        font.weight: Style.fontWeightMedium
-        anchors.verticalCenter: parent.verticalCenter
-
-        Behavior on color {
-          ColorAnimation { duration: Style.animationFast }
-        }
-      }
     }
 
-    // Load Average
-    Row {
-      spacing: 2
-      anchors.verticalCenter: parent.verticalCenter
-
-      Text {
-        text: ""
-        color: mouseArea.containsMouse ? Color.mOnPrimary : Color.mBlue
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeL
-        anchors.verticalCenter: parent.verticalCenter
-      }
-
-      Text {
-        text: SystemStatService.loadAvg.toFixed(2)
-        color: mouseArea.containsMouse ? Color.mOnPrimary : Color.mOnSurface
-        font.family: Style.fontFamily
-        font.pixelSize: Style.fontSizeS
-        font.weight: Style.fontWeightMedium
-        anchors.verticalCenter: parent.verticalCenter
-
-        Behavior on color {
-          ColorAnimation { duration: Style.animationFast }
-        }
-      }
+    SystemMonitorStat {
+      icon: ""
+      value: SystemStatService.loadAvg.toFixed(2)
+      hovered: mouseArea.containsMouse
     }
   }
 

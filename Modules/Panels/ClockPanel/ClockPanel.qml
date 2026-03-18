@@ -8,42 +8,11 @@ import qs.Modules.Cards
  * ClockPanel - Popup panel with calendar and timer
  * Opens below the bar clock, contains CalendarHeaderCard, CalendarMonthCard, TimerCard
  */
-PopupWindow {
+PanelPopup {
   id: root
 
-  property Item anchorItem: null
-  property ShellScreen screen: null
-
-  visible: false
-  color: "transparent"
-
-  // Position below the anchor item
-  anchor.item: anchorItem
-  anchor.rect.x: anchorItem ? (anchorItem.width - panelWidth) / 2 : 0
-  anchor.rect.y: anchorItem ? anchorItem.height + Style.marginS : 0
-
   property real panelWidth: 320
-
-  implicitWidth: panelContent.width
-  implicitHeight: panelContent.height
-
-  function toggle() {
-    if (visible) {
-      close();
-    } else {
-      open();
-    }
-  }
-
-  function open() {
-    PanelState.openPanel(root);
-    visible = true;
-  }
-
-  function close() {
-    visible = false;
-    PanelState.panelClosed(root);
-  }
+  panelContentItem: panelContent
 
 
 

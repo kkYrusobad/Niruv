@@ -9,42 +9,11 @@ import qs.Services.Media
  * VolumePanel - Popup panel with volume controls
  * Shows: Volume slider, mute toggle, open mixer button
  */
-PopupWindow {
+PanelPopup {
   id: root
 
-  property Item anchorItem: null
-  property ShellScreen screen: null
-
-  visible: false
-  color: "transparent"
-
-  // Position below the anchor item
-  anchor.item: anchorItem
-  anchor.rect.x: anchorItem ? (anchorItem.width - panelWidth) / 2 : 0
-  anchor.rect.y: anchorItem ? anchorItem.height + Style.marginS : 0
-
   property real panelWidth: 260
-
-  implicitWidth: panelContent.width
-  implicitHeight: panelContent.height
-
-  function toggle() {
-    if (visible) {
-      close();
-    } else {
-      open();
-    }
-  }
-
-  function open() {
-    PanelState.openPanel(root);
-    visible = true;
-  }
-
-  function close() {
-    visible = false;
-    PanelState.panelClosed(root);
-  }
+  panelContentItem: panelContent
 
   // Volume state from AudioService
   readonly property real volume: AudioService.volume
@@ -239,144 +208,120 @@ PopupWindow {
       }
 
       // Open mixer button
-      Rectangle {
+      PanelActionButton {
         Layout.fillWidth: true
-        Layout.preferredHeight: 36
-        radius: Style.radiusS
-        color: mixerMouseArea.containsMouse ? Qt.alpha(Color.mPrimary, 0.2) : Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: Style.borderS
-
-        Behavior on color {
-          ColorAnimation { duration: Style.animationFast }
-        }
-
-        RowLayout {
-          anchors.centerIn: parent
-          spacing: Style.marginS
-
-          Text {
-            text: "󰕾"
-            color: Color.mPrimary
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeL
-          }
-
-          Text {
-            text: "Open Audio Mixer"
-            color: Color.mOnSurface
-            font.family: Style.fontFamily
-            font.pixelSize: Style.fontSizeS
-            font.weight: Style.fontWeightMedium
-          }
-        }
-
-        MouseArea {
-          id: mixerMouseArea
-          anchors.fill: parent
-          hoverEnabled: true
-          cursorShape: Qt.PointingHandCursor
-          onClicked: {
-            root.close();
-            mixerProcess.running = true;
-          }
+        icon: "󰕾"
+        label: "Open Audio Mixer"
+        accentColor: Color.mPrimary
+        onClicked: {
+          root.close();
+          mixerProcess.running = true;
         }
       }
 
       // Output Devices section
-      Rectangle {
+      Loader {
+        id: devicesLoader
         Layout.fillWidth: true
-        Layout.preferredHeight: devicesColumn.implicitHeight + Style.marginM * 2
-        radius: Style.radiusM
-        color: Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: Style.borderS
-        visible: AudioService.sinks && AudioService.sinks.length > 1
+        Layout.preferredHeight: item ? item.implicitHeight : 0
+        active: root.visible && AudioService.sinks && AudioService.sinks.length > 1
+        visible: active
 
-        ColumnLayout {
-          id: devicesColumn
-          anchors.fill: parent
-          anchors.margins: Style.marginM
-          spacing: Style.marginS
+        sourceComponent: Component {
+          Rectangle {
+            width: devicesLoader.width
+            implicitHeight: devicesColumn.implicitHeight + Style.marginM * 2
+            radius: Style.radiusM
+            color: Color.mSurfaceVariant
+            border.color: Color.mOutline
+            border.width: Style.borderS
 
-          // Section header
-          RowLayout {
-            Layout.fillWidth: true
-            spacing: Style.marginS
+            ColumnLayout {
+              id: devicesColumn
+              anchors.fill: parent
+              anchors.margins: Style.marginM
+              spacing: Style.marginS
 
-            Text {
-              text: "󰓃"
-              color: Color.mPrimary
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeL
-            }
-
-            Text {
-              text: "Output Device"
-              color: Color.mOnSurface
-              font.family: Style.fontFamily
-              font.pixelSize: Style.fontSizeS
-              font.weight: Style.fontWeightMedium
-              Layout.fillWidth: true
-            }
-          }
-
-          // Device list
-          Repeater {
-            model: AudioService.sinks
-
-            Rectangle {
-              required property var modelData
-              required property int index
-
-              Layout.fillWidth: true
-              Layout.preferredHeight: 32
-              radius: Style.radiusS
-              color: deviceMouseArea.containsMouse ? Qt.alpha(Color.mPrimary, 0.15) : "transparent"
-
+              // Section header
               RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: Style.marginS
-                anchors.rightMargin: Style.marginS
+                Layout.fillWidth: true
                 spacing: Style.marginS
 
-                // Radio indicator
-                Rectangle {
-                  Layout.preferredWidth: 16
-                  Layout.preferredHeight: 16
-                  radius: 8
-                  color: "transparent"
-                  border.color: AudioService.sink?.id === modelData.id ? Color.mPrimary : Color.mOnSurfaceVariant
-                  border.width: 2
-
-                  Rectangle {
-                    anchors.centerIn: parent
-                    width: 8
-                    height: 8
-                    radius: 4
-                    color: Color.mPrimary
-                    visible: AudioService.sink?.id === modelData.id
-                  }
+                Text {
+                  text: "󰓃"
+                  color: Color.mPrimary
+                  font.family: Style.fontFamily
+                  font.pixelSize: Style.fontSizeL
                 }
 
-                // Device name
                 Text {
-                  text: modelData.description || modelData.name || "Unknown Device"
+                  text: "Output Device"
                   color: Color.mOnSurface
                   font.family: Style.fontFamily
                   font.pixelSize: Style.fontSizeS
-                  elide: Text.ElideRight
+                  font.weight: Style.fontWeightMedium
                   Layout.fillWidth: true
                 }
               }
 
-              MouseArea {
-                id: deviceMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                  AudioService.setAudioSink(modelData);
+              // Device list
+              Repeater {
+                model: AudioService.sinks
+
+                Rectangle {
+                  required property var modelData
+                  required property int index
+
+                  Layout.fillWidth: true
+                  Layout.preferredHeight: 32
+                  radius: Style.radiusS
+                  color: deviceMouseArea.containsMouse ? Qt.alpha(Color.mPrimary, 0.15) : "transparent"
+
+                  RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: Style.marginS
+                    anchors.rightMargin: Style.marginS
+                    spacing: Style.marginS
+
+                    // Radio indicator
+                    Rectangle {
+                      Layout.preferredWidth: 16
+                      Layout.preferredHeight: 16
+                      radius: 8
+                      color: "transparent"
+                      border.color: AudioService.sink?.id === modelData.id ? Color.mPrimary : Color.mOnSurfaceVariant
+                      border.width: 2
+
+                      Rectangle {
+                        anchors.centerIn: parent
+                        width: 8
+                        height: 8
+                        radius: 4
+                        color: Color.mPrimary
+                        visible: AudioService.sink?.id === modelData.id
+                      }
+                    }
+
+                    // Device name
+                    Text {
+                      text: modelData.description || modelData.name || "Unknown Device"
+                      color: Color.mOnSurface
+                      font.family: Style.fontFamily
+                      font.pixelSize: Style.fontSizeS
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
+                    }
+                  }
+
+                  MouseArea {
+                    id: deviceMouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                      AudioService.setAudioSink(modelData);
+                    }
+                  }
                 }
               }
             }
