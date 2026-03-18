@@ -50,6 +50,7 @@ This keeps startup lighter, maintenance simpler, and feature parity intact.
 - ⌨️ **JetBrainsMono Nerd Font** throughout
 - 🚀 **Minimalist Launcher** with app search + system menu (Tab to switch modes)
 - 🖱️ **Click-outside-to-close** panels - click anywhere outside or press ESC
+- 🧭 **Deterministic popup lifecycle** - shared close/open path avoids close-reopen flicker
 - 📺 **On-Screen Display (OSD)** visual feedback for volume/brightness/media changes
 - 🎬 **Animation profiles** with `subtle` / `balanced` / `expressive` motion modes
 - ⚡ **Power Profiles** switch between Performance/Balanced/Power Saver modes
@@ -58,6 +59,7 @@ This keeps startup lighter, maintenance simpler, and feature parity intact.
 ### Minimal Architecture Highlights
 
 - Shared panel shell via `Commons/PanelPopup.qml` used across major panels.
+- Popup lifecycle ownership is centralized (`PanelPopup` + `PanelState`) to prevent transition races.
 - Shared micro-components (`PanelActionButton`, `PanelStatusChip`, `PanelInfoPill`) reduce repeated QML blocks.
 - Shared panel primitives (`SliderControl`, `MetricRow`, `PanelSurface`) keep panels explicit but DRY.
 - Bar edge icons support independent side spacing via `bar.edgeIcons.sectionGapLeft` and `sectionGapRight`.

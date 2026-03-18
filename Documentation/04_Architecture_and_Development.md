@@ -81,6 +81,51 @@ Panel modules should share primitives and avoid repeated inline blocks when poss
 Use `PanelPopup` for popup roots and keep panel internals focused on feature-specific content.
 Prefer `SliderControl` and `MetricRow` when matching those repeated interaction patterns.
 
+### Popup Lifecycle (Post-Overhaul Fix)
+
+Niruv had a popup flicker regression after a large UI overhaul. The symptom was reproducible with:
+
+1. Open a bar popup (for example the center ClockPanel).
+2. Click empty screen space outside the popup.
+3. The popup would close, then briefly appear to reopen and close again.
+
+#### Root Cause
+
+The flicker came from multiple overlapping lifecycle and animation controllers:
+
+- `PanelPopup` already controlled open/close transitions.
+- Individual panel files also animated `scale` and `opacity` from `root.visible`.
+- Backdrop close used click-phase timing (`onClicked`), which can race with release-phase pointer propagation.
+- Transitional close states introduced a short window where re-entry could occur.
+
+This created an accidental double-transition path (close -> brief reopen pulse -> close).
+
+#### Final Architecture
+
+Popup lifecycle is now intentionally simple and single-owner:
+
+- `Commons/PanelPopup.qml` is the only owner of popup open/close state (`isOpen`) and panel content transition properties.
+- `Commons/PanelState.qml` tracks one active panel and provides centralized close-on-outside behavior.
+- `shell.qml` backdrop closes on `onPressed` and consumes the pointer event.
+- Panel modules no longer duplicate `root.visible`-driven `scale`/`opacity` behaviors.
+
+#### Invariants (Must Keep)
+
+1. Do not add panel-local `scale`/`opacity` animation blocks tied to `root.visible` in `Modules/Panels/*` when using `PanelPopup`.
+2. Keep lifecycle ownership in `PanelPopup` and routing ownership in `PanelState`.
+3. Keep backdrop close handling in press-phase, not click-phase, to reduce pointer ordering races.
+4. Preserve one-open-panel semantics: opening a new panel closes the current one.
+
+#### Regression Checklist
+
+When modifying popup behavior, verify all of the following manually:
+
+1. Open/close each popup rapidly via bar widgets.
+2. Close via outside click in empty screen area (not bar).
+3. Close via Escape.
+4. Switch quickly between two different panel widgets.
+5. Confirm no close->reopen pulse and no stuck backdrop.
+
 ### Cards (`Modules/Cards/`)
 
 Reusable card components used within panels:
@@ -113,3 +158,11 @@ Run the shell with `NIRUV_DEBUG=1` to see debug output from `Logger.d()` calls.
 ```bash
 NIRUV_DEBUG=1 qs -c niruv
 ```
+
+For popup lifecycle debugging, log at these points first:
+
+1. `PanelPopup.open()` and `PanelPopup.close()`
+2. `PanelState.openPanel()` and `PanelState.closeOpenPanel()`
+3. Backdrop `MouseArea.onPressed` in `shell.qml`
+
+This quickly reveals event ordering issues without adding panel-specific instrumentation.

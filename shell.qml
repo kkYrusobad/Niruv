@@ -132,7 +132,9 @@ ShellRoot {
       MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-        onClicked: {
+        preventStealing: true
+        onPressed: function(mouse) {
+          mouse.accepted = true;
           PanelState.closeOpenPanel();
         }
       }

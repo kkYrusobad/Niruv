@@ -223,25 +223,6 @@ PanelPopup {
           }
         }
       }
-
-    // Animation
-    scale: root.visible ? 1.0 : 0.95
-    opacity: root.visible ? 1.0 : 0.0
-    transformOrigin: Item.Top
-
-    Behavior on scale {
-      NumberAnimation {
-        duration: Style.animationFast
-        easing.type: Style.easingEnter
-      }
-    }
-
-    Behavior on opacity {
-      NumberAnimation {
-        duration: Style.animationFast
-        easing.type: Style.easingEnter
-      }
-    }
   }
 
   // Process to open mixer

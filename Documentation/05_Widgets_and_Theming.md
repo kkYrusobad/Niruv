@@ -231,8 +231,18 @@ All popup panels share consistent behavior:
 - **Click-Outside-to-Close**: Click anywhere outside the panel to close it
 - **ESC Key**: Press Escape to close the panel
 - **Auto-Close on New Panel**: Opening a new panel automatically closes any open panel
-- **Smooth Animations**: Scale and fade animations on open/close
-- **PanelState Singleton**: Centralized tracking via `Commons/PanelState.qml`
+- **Single Lifecycle Owner**: `PanelPopup` owns popup visibility and transition state
+- **PanelState Singleton**: Centralized routing/tracking via `Commons/PanelState.qml`
+- **Press-Phase Backdrop Close**: Outside close is handled on pointer press in `shell.qml`
+
+### Popup Flicker Regression Note
+
+After an overhaul, Niruv had a close flicker caused by duplicated animation ownership:
+
+- Shared popup shell (`PanelPopup`) and panel modules both animated visibility transitions.
+- Backdrop close timing allowed a brief event race.
+
+The fix was to keep popup lifecycle logic in one place (`PanelPopup`) and remove panel-local `root.visible` transition duplication. When extending panels, prefer animation on internal content details, not popup visibility state.
 
 ## ⚡ Performance Notes
 

@@ -10,11 +10,21 @@ QtObject {
 
   // Currently open panel (null if none)
   property var currentPanel: null
-  property double lastOpenAtMs: 0
-  property int closeGuardAfterOpenMs: 180
 
   // Track if any panel is open
-  readonly property bool hasOpenPanel: currentPanel !== null && currentPanel.visible
+  readonly property bool hasOpenPanel: {
+    if (currentPanel === null) {
+      return false;
+    }
+
+    // PanelPopup-based panels expose isOpen/isClosing; keep backdrop only while truly open.
+    if (currentPanel.isOpen !== undefined || currentPanel.isClosing !== undefined) {
+      return !!currentPanel.isOpen;
+    }
+
+    // Fallback for popup-like components that only expose visible (e.g. tray menu).
+    return !!currentPanel.visible;
+  }
 
   // Register a panel as open (closes any existing panel first)
   function openPanel(panel) {
@@ -22,17 +32,11 @@ QtObject {
       root.currentPanel.close();
     }
     root.currentPanel = panel;
-    root.lastOpenAtMs = Date.now();
   }
 
   // Close the currently open panel
   function closeOpenPanel() {
-    const now = Date.now();
-    if ((now - root.lastOpenAtMs) < root.closeGuardAfterOpenMs) {
-      return;
-    }
-
-    if (root.currentPanel && root.currentPanel.visible) {
+    if (root.currentPanel) {
       root.currentPanel.close();
     }
   }

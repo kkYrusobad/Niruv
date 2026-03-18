@@ -17,11 +17,9 @@ PopupWindow {
   property real panelScale: isOpen ? 1.0 : 0.97
 
   property bool isOpen: false
-  property bool isClosing: false
-  property double lastTransitionAtMs: 0
-  property int transitionGuardMs: 180
+  readonly property bool isClosing: false
 
-  visible: isOpen || isClosing
+  visible: isOpen
   color: "transparent"
 
   anchor.item: anchorItem
@@ -67,25 +65,7 @@ PopupWindow {
     }
   }
 
-  Timer {
-    id: closeCleanupTimer
-    interval: Style.animationFast + 40
-    running: false
-    repeat: false
-    onTriggered: {
-      if (!root.isOpen) {
-        root.isClosing = false;
-        PanelState.panelClosed(root);
-      }
-    }
-  }
-
   function toggle() {
-    const now = Date.now();
-    if ((now - lastTransitionAtMs) < transitionGuardMs) {
-      return;
-    }
-
     if (isOpen) {
       close();
     } else {
@@ -94,31 +74,20 @@ PopupWindow {
   }
 
   function open() {
-    const now = Date.now();
-    if ((now - lastTransitionAtMs) < transitionGuardMs) {
+    if (isOpen) {
       return;
     }
 
-    lastTransitionAtMs = now;
     PanelState.openPanel(root);
-    closeCleanupTimer.stop();
-    isClosing = false;
     isOpen = true;
   }
 
   function close() {
-    const now = Date.now();
-    if ((now - lastTransitionAtMs) < transitionGuardMs) {
+    if (!isOpen) {
       return;
     }
 
-    if (!isOpen && !isClosing) {
-      return;
-    }
-
-    lastTransitionAtMs = now;
     isOpen = false;
-    isClosing = true;
-    closeCleanupTimer.restart();
+    PanelState.panelClosed(root);
   }
 }
