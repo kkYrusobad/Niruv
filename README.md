@@ -39,7 +39,7 @@ This keeps startup lighter, maintenance simpler, and feature parity intact.
 - 🎥 **Screen Recorder** with recording status, hover expansion, and direct launch
 - 📶 **WiFi widget** with SSID display on hover, click opens NetworkPanel
 - 🔵 **Bluetooth widget** with connected device display, click opens NetworkPanel
-- 🎵 **Media widget** showing current track (Artist - Title), with MediaPanel popup (album art background)
+- 🎵 **Media widget** showing current track (Artist - Title), with an ultra-compact MediaPanel popup (blurred album art card, integrated volume)
 - 🎼 **Cava Visualizer** integrated audio spectrum display
 - 🔊 **Volume widget** with VolumePanel popup, audio device switching, scroll to adjust
 - ☀️ **Brightness widget** with BrightnessPanel popup including Night Light controls

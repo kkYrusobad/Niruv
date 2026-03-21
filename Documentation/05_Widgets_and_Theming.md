@@ -138,6 +138,20 @@ Shows the currently focused window's icon and title.
 - **Niri Integration**: Polls `niri msg -j focused-window` every 500ms
 - **Capsule Style**: Matches visual style of other bar widgets
 
+### Media Widget
+
+Displays the currently playing media from any MPRIS-compatible player (Spotify, Firefox, mpd, etc).
+
+- **Track Info**: Shows the artist and track title in a stylized capsule.
+- **Left-Click**: Toggles the **MediaPanel** popup.
+- **Right-Click**: Quick play/pause toggle directly from the bar.
+- **MediaPanel Features**:
+  - Ultra-compact vertical card layout designed to minimize vertical space.
+  - Large, prominent album art display.
+  - Deep-blurred album art background using precise `MultiEffect` rounded-corner masking.
+  - Playback controls (Previous, Play/Pause, Next) with responsive animations.
+  - Seamlessly integrated, slider-based volume control for the active audio sink.
+
 ### System Tray Widget
 
 Displays system tray icons from applications using the Quickshell SystemTray API.
