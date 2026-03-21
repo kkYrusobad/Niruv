@@ -133,12 +133,12 @@ Singleton {
 
   // Get appropriate icon based on volume/mute state
   function getIcon(): string {
-    if (muted) return "󰝟";  // muted icon
+    if (muted) return "";  // muted icon
 
-    if (volume < root.epsilon) return "󰝟";  // effectively 0
-    if (volume <= 0.33) return "󰕿";  // low
-    if (volume <= 0.66) return "󰖀";  // medium
-    return "󰕾";  // high
+    if (volume < root.epsilon) return "";  // effectively 0
+    if (volume <= 0.33) return "";  // low
+    if (volume <= 0.66) return "";  // medium
+    return "";  // high
   }
 
   // Get volume as percentage string
