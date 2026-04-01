@@ -52,7 +52,8 @@ Item {
     volume: true,
     brightness: true,
     nightLight: false,
-    battery: true
+    battery: true,
+    vpn: true
   })
 
   function widgetEnabled(name) {
@@ -366,6 +367,18 @@ Item {
               anchors.verticalCenter: parent.verticalCenter
               screen: root.screen
               networkPanel: sharedNetworkPanel
+            }
+          }
+        }
+
+        // VPN widget
+        Loader {
+          active: root.widgetEnabled("vpn")
+          anchors.verticalCenter: parent.verticalCenter
+          sourceComponent: Component {
+            Vpn {
+              anchors.verticalCenter: parent.verticalCenter
+              screen: root.screen
             }
           }
         }

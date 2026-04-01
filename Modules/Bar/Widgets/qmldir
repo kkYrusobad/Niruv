@@ -15,3 +15,4 @@ ActiveWindow 1.0 ActiveWindow.qml
 Tray 1.0 Tray.qml
 TrayMenu 1.0 TrayMenu.qml
 SystemMonitorStat 1.0 SystemMonitorStat.qml
+Vpn 1.0 Vpn.qml
