@@ -21,7 +21,7 @@ Item {
   readonly property string displayText: isConnected ? vpnName : "No VPN"
 
   // Icon based on state
-  readonly property string vpnIconText: isConnected ? "" : ""
+  readonly property string vpnIconText: isConnected ? "󱠾" : "󱠽"
 
   // --- Dimensions ---
   implicitWidth: vpnRow.width
