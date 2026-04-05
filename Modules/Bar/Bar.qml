@@ -5,6 +5,7 @@ import qs.Commons
 import qs.Modules.Bar.Widgets
 import qs.Modules.Panels.ClockPanel
 import qs.Modules.Panels.NetworkPanel
+import qs.Modules.Panels.VpnPanel
 
 /*
  * Niruv Bar - Main bar component with workspaces and clock
@@ -139,6 +140,13 @@ Item {
   ClockPanel {
     id: clockPanel
     anchorItem: clockArea
+    screen: root.screen
+  }
+
+  // VPN Panel
+  VpnPanel {
+    id: vpnPanelInstance
+    anchorItem: vpnWidgetLoader.item ? vpnWidgetLoader.item : networkAnchor
     screen: root.screen
   }
 
@@ -373,12 +381,14 @@ Item {
 
         // VPN widget
         Loader {
+          id: vpnWidgetLoader
           active: root.widgetEnabled("vpn")
           anchors.verticalCenter: parent.verticalCenter
           sourceComponent: Component {
             Vpn {
               anchors.verticalCenter: parent.verticalCenter
               screen: root.screen
+              vpnPanel: vpnPanelInstance
             }
           }
         }

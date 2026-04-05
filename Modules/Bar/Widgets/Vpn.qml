@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Modules.Panels.VpnPanel
 
 /*
  * Niruv VPN Widget - Shows VPN connection status
@@ -11,6 +12,7 @@ Item {
   id: root
 
   property ShellScreen screen: null
+  property VpnPanel vpnPanel: null
 
   // --- VPN State ---
   property string vpnState: "disconnected"
@@ -149,6 +151,7 @@ Item {
 
   // --- Interaction ---
   property bool isExpanded: false
+  property double toggleCooldownUntil: 0
 
   MouseArea {
     id: mouseArea
@@ -160,6 +163,20 @@ Item {
     onExited: {
       expandTimer.stop()
       isExpanded = false
+    }
+
+    onClicked: {
+      const now = Date.now();
+      if (now < root.toggleCooldownUntil) return;
+      root.toggleCooldownUntil = now + 220;
+
+      if (vpnPanel) {
+        if (vpnPanel.toggleFromBar) {
+          vpnPanel.toggleFromBar();
+        } else {
+          vpnPanel.toggle();
+        }
+      }
     }
   }
 
